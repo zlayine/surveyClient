@@ -6,8 +6,17 @@
       <img class="w-full" :src="login_img" alt="login_img" />
     </div>
     <div class="mt-7" v-if="!$route.query.code">
-      <button class="rounded-xl bg-green-500 text-white text-xl px-8 py-2" :disbled="!!$route.query.code" @click="signin">
-        Sign in with intra
+      <button
+        class="rounded-xl bg-green-500 text-white text-xl px-8 py-2"
+        :disbled="!!$route.query.code"
+        @click="signin"
+        :disabled="loading"
+      >
+        <template v-if="loading">
+          <i-fa class="text-white" icon="circle-notch" spin />
+          Signin in
+        </template>
+        <template v-else> Sign in with intra </template>
       </button>
     </div>
   </div>
@@ -19,11 +28,38 @@ import login_img from "@/assets/login_img.svg";
 export default {
   data() {
     return {
+      loading: false,
       login_img: login_img,
     };
   },
+  created() {
+    if (this.currentUser) this.$router.push("/");
+    if (this.$route.query.code) this.accessData();
+  },
+  mounted() {
+    this.loading = false;
+  },
+  methods: {
+    async signin() {
+      this.loading = true;
+      // if (!this.currentUser) window.location.href = process.env.VUE_APP_AUTH_42;
+      // else
+      // login(this.currentUser.user);
+      await this.$store.dispatch("login", "6050823778673083d169e0ee");
+      this.loading = false;
+      this.$router.push("/");
+    },
+    async accessData() {
+      this.loading = true;
+      await this.$store.dispatch("createUser", this.$route.query.code + "");
+      this.loading = false;
+      this.$router.push("/");
+    },
+  },
+  computed: {
+    currentUser() {
+      return this.$store.getters.currentUser;
+    },
+  },
 };
 </script>
-
-<style>
-</style>

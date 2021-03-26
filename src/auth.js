@@ -1,31 +1,4 @@
-/* eslint-disable */
 import axios from 'axios'
-
-export async function login(user_id) {
-	const res = await axios({
-		url: process.env.VUE_APP_GRAPHQL_API,
-		method: 'post',
-		data: {
-			query: `
-					query { 
-						login (userId: "${user_id}") {
-							user {
-								_id
-								username
-								displayname
-								image_url
-								staff
-								campus
-							}
-							token
-						}
-					}
-				`
-		}
-	});
-	// console.log(res.data);
-	return res.data;
-}
 
 export function getLocalUser() {
 	const userStr = localStorage.getItem("user");

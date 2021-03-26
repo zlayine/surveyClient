@@ -9,17 +9,20 @@
         <span>PLATE</span>
       </div> -->
     </div>
-    <div class="nav_items flex flex-row justify-between" v-if="$route.name != 'auth'">
+    <div
+      class="nav_items flex flex-row justify-between"
+      v-if="$route.name != 'auth'"
+    >
       <router-link class="link" to="/">Surveys</router-link>
       <router-link class="link" to="/addsurvey">Create survey</router-link>
       <router-link class="link" to="/admin">Admin panel</router-link>
     </div>
     <div class="nav_actions">
-      <div class="action" v-if="user">
-        <!-- <v-avatar color="primary" class="avatar" size="50"> -->
-        <!-- <img :src="user.image_url" alt="avatar-img" /> -->
-        <!-- </v-avatar> -->
-        <div class="link" @click="logout">
+      <div class="action flex flex-row" v-if="user">
+        <div class="w-16 rounded-full shadow-md overflow-hidden">
+          <img class="w-full" :src="user.image_url" alt="avatar-img" />
+        </div>
+        <div class="ml-5 text-4xl my-auto cursor-pointer hover:text-gray-600 transition-all" @click="logout">
           <i-fa icon="sign-out-alt" />
         </div>
       </div>
@@ -42,7 +45,6 @@ export default {
   },
   computed: {
     user() {
-      return null;
       return this.$store.getters.user;
     },
   },
