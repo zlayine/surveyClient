@@ -3,6 +3,8 @@ import { createWebHistory, createRouter } from "vue-router";
 import Home from '@/pages/Home.vue'
 import Survey from '@/pages/Survey.vue'
 import CreateSurvey from '@/pages/CreateSurvey.vue'
+import StatsSurvey from '@/pages/StatsSurvey.vue'
+import Admin from '@/pages/Admin.vue'
 import Auth from '@/pages/Auth.vue'
 import NotFound from '@/pages/NotFound.vue'
 
@@ -16,7 +18,7 @@ const routes = [
 		}
 	},
 	{
-		path: "/",
+		path: "/survey/:id",
 		name: "survey",
 		component: Survey,
 		meta: {
@@ -24,9 +26,25 @@ const routes = [
 		}
 	},
 	{
-		path: "/",
+		path: "/stats/:id",
+		name: "stats",
+		component: StatsSurvey,
+		meta: {
+			requiresAuth: true,
+		}
+	},
+	{
+		path: "/addsurvey",
 		name: "addsurvey",
 		component: CreateSurvey,
+		meta: {
+			requiresAuth: true,
+		}
+	},
+	{
+		path: "/admin",
+		name: "admin",
+		component: Admin,
 		meta: {
 			requiresAuth: true,
 		}
@@ -40,14 +58,14 @@ const routes = [
 		}
 	},
 	{
-		path: "*",
+		path: "/:pathMatch(.*)*",
 		component: NotFound,
 	}
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes,
+	history: createWebHistory(),
+	routes,
 	scrollBehavior(to, from, savedPosition) {
 		return { x: 0, y: 0 }
 	}
