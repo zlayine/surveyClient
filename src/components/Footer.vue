@@ -1,6 +1,6 @@
 <template>
-  <footer class="footer">
-		<!-- with <i-fa icon="heart" class="text-red-500"/> -->
+  <footer class="footer font-medium text-lg">
+		<!-- with <i-fa icon="brain" class="text-pink-500 text-2xl"/> -->
     Made  for 1337
   </footer>
 </template>

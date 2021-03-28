@@ -28,11 +28,11 @@
               :class="{ 'bg-indigo-300': this.question != index }"
             >
               <option value="0">Question type</option>
-              <option>Choice</option>
-              <option>Multiple</option>
-              <option>Rate</option>
-              <option>Paragraph</option>
-              <option>Image</option>
+              <option value="choice">Choice</option>
+              <option value="multiple">Multiple</option>
+              <option value="rate">Rate</option>
+              <option value="text">Text</option>
+              <option value="image">Image</option>
             </select>
           </div>
         </div>
@@ -45,7 +45,7 @@
           </div>
           <div
             @click="removeQuestion(index)"
-            class="mr-0 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-red-300 transition-all cursor-pointer"
+            class="mr-0 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-red-500 transition-all cursor-pointer"
           >
             <i-fa icon="trash" class="m-auto" />
           </div>
@@ -57,32 +57,32 @@
       >
         <span class="text-sm font-bold text-gray-300">Question</span>
         <textarea
-          v-model="question.title"
+          v-model="question.name"
           class="block w-full rounded-lg text-xl resize-none bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           rows="3"
         ></textarea>
       </div>
       <transition name="expand" appear mode="out-in">
         <div
-          class="answers mt-3 relative"
+          class="options mt-3 relative"
           :class="{ 'pointer-events-none': this.question != index }"
           v-show="this.question == index && question.type != 0"
         >
           <span
             class="text-sm font-bold text-gray-300"
-            v-if="question.answers.length"
+            v-if="question.options.length"
             >Options</span
           >
           <div
             class="mb-2 mt-2 flex flex-row"
-            v-for="(answer, index) in question.answers"
+            v-for="(option, index) in question.options"
             :key="index"
           >
             <input
               class="flex-1 py-3 block w-full rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               type="text"
-              v-if="question.type != 'Image'"
-              v-model="answer.name"
+              v-if="question.type != 'image'"
+              v-model="option.name"
               placeholder="name"
             />
             <div class="flex-1 flex" v-else>
@@ -90,22 +90,22 @@
                 class="w-full flex rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer"
                 @click="launchFilePicker(index)"
               >
-                <div class="p-2 ml-3 h-12 flex" v-if="!answer.url">
+                <div class="p-2 ml-3 h-12 flex" v-if="!option.url">
                   <i-fa icon="plus" class="my-auto mr-2" />
                   <span class="my-auto"> Add Image </span>
                 </div>
                 <img
-                  v-if="answer.url"
+                  v-if="option.url"
                   class="h-12 w-20 object-contain"
-                  :src="answer.url"
+                  :src="option.url"
                   alt=""
                 />
                 <div
                   class="flex flex-1 p-2 justify-between m-auto"
-                  v-if="answer.url"
+                  v-if="option.url"
                 >
-                  <div>{{ answer.name.name }}</div>
-                  <div class="">{{ sizeFilter(answer.size) }}</div>
+                  <div>{{ option.file.name }}</div>
+                  <div class="">{{ sizeFilter(option.size) }}</div>
                 </div>
               </div>
               <input
@@ -118,19 +118,19 @@
             <div class="ml-2 flex flex-row my-auto">
               <div
                 class="mr-1 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-indigo-300 transition-all cursor-pointer"
-                @click="moveAnswer(index, 'up')"
+                @click="moveOption(index, 'up')"
               >
                 <i-fa icon="chevron-up" class="m-auto" />
               </div>
               <div
                 class="mr-1 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-indigo-300 transition-all cursor-pointer"
-                @click="moveAnswer(index)"
+                @click="moveOption(index)"
               >
                 <i-fa icon="chevron-down" class="m-auto" />
               </div>
               <div
-                @click="removeAnswer(index)"
-                class="mr-0 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-red-300 transition-all cursor-pointer"
+                @click="removeOption(index)"
+                class="mr-0 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-red-500 transition-all cursor-pointer"
               >
                 <i-fa icon="trash" class="m-auto" />
               </div>
@@ -138,7 +138,7 @@
           </div>
           <button
             v-show="typeChecker(question)"
-            @click="addAnswer(question)"
+            @click="addOption(question)"
             class="mt-2 ring ring-green-400 ring-opacity-30 border-green-400 border-opacity-50 focus:outline-none w-full rounded-xl p-2 text-lg text-green-400 transition-all"
           >
             <i-fa icon="plus" class="mr-1" />Add Option
@@ -146,25 +146,35 @@
         </div>
       </transition>
     </div>
-    <div
-      @click="newQuestion"
-      class="bg-green-400 text-xl rounded-full text-white w-12 h-12 shadow-xl mt-3 flex cursor-pointer hover:shadow-none transition-all"
-    >
-      <i-fa icon="plus" class="m-auto" />
+    <div class="flex justify-between">
+      <div
+        @click="newQuestion"
+        class="bg-green-400 text-xl rounded-full text-white w-12 h-12 shadow-xl mt-3 flex cursor-pointer hover:shadow-none transition-all"
+      >
+        <i-fa icon="plus" class="m-auto" />
+      </div>
+      <div
+        @click="saveQuestions"
+        class="bg-indigo-400 text-xl rounded-xl px-3 justify-center items-center text-white shadow-xl mt-3 flex cursor-pointer hover:shadow-none transition-all"
+      >
+        Save
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
+  emits: ["save", "updated"],
   data() {
     return {
       question: 0,
-      answer: null,
+      option: null,
+      changed: true,
       questions: [
         {
-          type: "Choice",
-          answers: [
+          type: "choice",
+          options: [
             {
               name: null,
             },
@@ -173,46 +183,60 @@ export default {
       ],
     };
   },
+  watch: {
+    questions: {
+      deep: true,
+      handler: "updatedQuestions",
+    },
+  },
   methods: {
     newQuestion() {
-      this.questions.push({ type: "Choice", title: null, answers: [] });
+      this.questions.push({ type: "choice", name: "", options: [] });
       this.question++;
+    },
+    updatedQuestions() {
+      if (!this.changed) this.$emit("updated", "updated");
+      this.changed = true;
+    },
+    saveQuestions() {
+      this.changed = false;
+      this.$emit("save", this.questions);
     },
     selectQuestion(index) {
       this.question = index;
     },
     typeChecker(question) {
-      if (question.type == "Paragraph" && question.answers.length > 0)
+      if (question.type == "text" && question.options.length > 0)
         return false;
-      else if (question.type == "Image" && question.answers.length > 2)
+      else if (question.type == "image" && question.options.length > 2)
         return false;
-      else if (question.type == "Rate" && question.answers.length > 9)
+      else if (question.type == "rate" && question.options.length > 9)
         return false;
       return true;
     },
-    addAnswer(question) {
-      if (this.typeChecker(question)) question.answers.push({ name: null });
+    addOption(question) {
+      if (this.typeChecker(question)) question.options.push({ name: null });
     },
     launchFilePicker(index) {
-      this.answer = index;
+      this.option = index;
       this.$refs.file.click();
     },
     onFileChange(file) {
-      let answer = this.questions[this.question].answers[this.answer];
+      let option = this.questions[this.question].options[this.option];
       const maxSize = 1024;
       let imageFile = file[0];
       if (file.length > 0) {
-        answer.size = imageFile.size / maxSize / maxSize;
+        option.size = imageFile.size / maxSize / maxSize;
         if (imageFile.type.match("image.*")) {
-          answer.name = imageFile;
-          answer.url = URL.createObjectURL(imageFile);
+          option.file = imageFile;
+          option.url = URL.createObjectURL(imageFile);
         }
         if (typeof FileReader === "function") {
           const reader = new FileReader();
           reader.onload = (event) => {
-            answer.url = event.target.result;
+            option.url = event.target.result;
           };
-          reader.readAsDataURL(answer.name);
+          reader.readAsDataURL(option.file);
         } else {
           console.log("FileReader API not supported");
         }
@@ -221,26 +245,29 @@ export default {
     removeQuestion(i) {
       this.questions = this.questions.filter((q, index) => index != i);
     },
-    removeAnswer(i) {
-      this.questions[this.question].answers = this.questions[
+    removeOption(i) {
+      this.questions[this.question].options = this.questions[
         this.question
-      ].answers.filter((q, index) => index != i);
+      ].options.filter((q, index) => index != i);
     },
     duplicateQuestion() {
       var obj = Object.assign({}, this.questions[this.question]);
       this.questions.splice(this.question, 0, obj);
     },
-    moveAnswer(index, direction) {
-      if (!this.questions[this.question].answers.length) return;
-      let answer = this.questions[this.question].answers[index];
+    moveOption(index, direction) {
+      if (!this.questions[this.question].options.length) return;
+      let option = this.questions[this.question].options[index];
       if (direction && index != 0) {
-        let tmp = this.questions[this.question].answers[index - 1];
-        this.questions[this.question].answers[index - 1] = answer;
-        this.questions[this.question].answers[index] = tmp;
-      } else if (!direction && index != this.questions[this.question].answers.length - 1) {
-        let tmp = this.questions[this.question].answers[index + 1];
-        this.questions[this.question].answers[index + 1] = answer;
-        this.questions[this.question].answers[index] = tmp;
+        let tmp = this.questions[this.question].options[index - 1];
+        this.questions[this.question].options[index - 1] = option;
+        this.questions[this.question].options[index] = tmp;
+      } else if (
+        !direction &&
+        index != this.questions[this.question].options.length - 1
+      ) {
+        let tmp = this.questions[this.question].options[index + 1];
+        this.questions[this.question].options[index + 1] = option;
+        this.questions[this.question].options[index] = tmp;
       }
     },
     sizeFilter(val) {
@@ -254,7 +281,4 @@ export default {
 
 
 <style>
-.create .answers {
-  will-change: height;
-}
 </style>

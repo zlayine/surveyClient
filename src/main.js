@@ -8,8 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import '@/assets/tailwind.css'
 
-// import { initialize } from './auth.js'
-// initialize(store, router);
+import { initialize } from './auth.js'
+initialize(store, router);
 
 // Vue.config.productionTip = false
 

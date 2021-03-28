@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-between w-full px-4">
-    <h1 class="text-2xl font-bold my-auto">{{ titles[selected] }}</h1>
+    <h1 class="text-lg sm:text-2xl font-bold my-auto">{{ titles[selected] }}</h1>
     <div class="flex justify-center rounded-lg text-lg" role="group">
       <button
         class="focus:outline-none hover:bg-indigo-500 hover:text-white border border-r-0 border-indigo-500 rounded-l-lg px-4 py-2 mx-0 outline-none focus:shadow-outline transition-all"

@@ -9,15 +9,15 @@
         <span>PLATE</span>
       </div> -->
     </div>
-    <div
+    <!-- <div
       class="nav_items flex flex-row justify-between"
       v-if="$route.name != 'auth'"
     >
-      <router-link class="link" to="/">Surveys</router-link>
-      <router-link class="link" to="/addsurvey">Create survey</router-link>
-      <router-link class="link" to="/admin">Admin panel</router-link>
-    </div>
+      <router-link class="link border-b-4 border-white hover:border-indigo-500" to="/">Surveys</router-link>
+      <router-link class="link border-b-4 border-white hover:border-indigo-500" to="/admin">Admin panel</router-link>
+    </div> -->
     <div class="nav_actions">
+      <router-link class="link border-b-4 border-white hover:border-indigo-500" to="/addsurvey">Create survey</router-link>
       <div class="action flex flex-row" v-if="user">
         <div class="w-16 rounded-full shadow-md overflow-hidden">
           <img class="w-full" :src="user.image_url" alt="avatar-img" />
@@ -55,8 +55,8 @@ export default {
       this.$router.push("/auth");
     },
     goToHome() {
-      this.$router.push("/?page=1");
-      this.$router.go();
+      this.$router.push("/");
+      // this.$router.go();
     },
   },
 };
@@ -108,15 +108,11 @@ export default {
   .nav_items {
     .link {
       text-decoration: none;
-      border-bottom: 4px solid #fff;
       margin-left: 40px;
       font-size: 22px;
       line-height: 25px;
       transition: 200ms all;
-
-      &:hover {
-        border-bottom: 4px solid #222;
-      }
+     
     }
   }
 

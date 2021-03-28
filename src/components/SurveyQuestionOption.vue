@@ -42,7 +42,7 @@
       {{ item.name }}
     </div>
   </template>
-  <template v-else-if="type == 'open'">
+  <template v-else-if="type == 'text'">
     <textarea
       class="block w-full mt-3 rounded-lg text-xl border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
       :disabled="disabled"
@@ -53,11 +53,11 @@
     ></textarea>
   </template>
   <template v-else-if="type == 'image'">
-    <div class="w-1/3 p-3 relative">
+    <div class="w-1/3 p-3 relative flex">
       <img
         class="w-auto m-auto object-contain max-h-80 overflow-hidden rounded-lg ring ring-indigo-300 ring-opacity-50 cursor-pointer transition-all"
         :class="{ 'filter-blur': selected, 'pointer-events-none': disabled }"
-        :src="item.name"
+        :src="url_host + item.name"
         @click="$emit('click', item)"
         alt="image survey"
       />
@@ -75,13 +75,20 @@
 
 <script>
 export default {
-  props: ["type", "item", "selected", "disabled"],
+  props: ["type", "item", "select", "disabled"],
   emits: ["click", "input"],
   data() {
     return {
       input: null,
+      url_host: import.meta.env.VITE_API_HOST,
     };
   },
   methods: {},
+  computed: {
+    selected() {
+      if (this.type != "multiple") return this.item == this.select[0];
+      else return this.select.filter((s) => s == item).length;
+    },
+  },
 };
 </script>

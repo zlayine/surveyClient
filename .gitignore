@@ -1,2 +1,4 @@
 diagram*
 node_modules
+public/options
+.DS_Store

@@ -3,17 +3,17 @@
     <div
       class="mx-5 ring ring-indigo-600 ring-opacity-50 rounded-xl bg-white text-center px-32 py-8 pt-14 text-2xl"
     >
-      {{ question.title }}
+      {{ question.name }}
     </div>
     <div class="flex flex-row justify-center flex-wrap mt-5 mx-5">
       <survey-question-option
-        v-for="item in question.options"
-        :key="item"
-        :type="question.type"
+        v-for="(item, index) in question.options"
+        :key="index"
+        :type="question.question_type.type"
         :item="item"
         @click="selectOption(item)"
         @input="setInput"
-        :selected="selected == item"
+        :select="selected"
       />
     </div>
   </div>
@@ -23,16 +23,24 @@
 import SurveyQuestionOption from "./SurveyQuestionOption.vue";
 export default {
   props: ["question"],
+  emits: ["select"],
   data() {
     return {
-      selected: null,
+      selected: [],
       input: null,
     };
   },
   methods: {
     selectOption(item) {
-      console.log(item);
-      this.selected = item;
+      if (this.question.question_type.type == "multiple") {
+        let slct = this.selected.filter((s) => s == item).length;
+        if (!slct) this.selected.push(item);
+        else this.selected = this.selected.filter((s) => s != item);
+      } else {
+        if (this.selected[0] == item) this.selected = [];
+        else this.selected = [item];
+      }
+      this.$emit("select", this.selected);
     },
     setInput(input) {
       this.input = input;

@@ -1,10 +1,8 @@
 <template>
-  <div class="container mx-auto pt-5 px-10 mb-32">
+  <div class="container mx-auto pt-5 px-3 sm:px-10 mb-32">
     <filter-layout title="Surveys" />
     <div class="flex flex-row justify-between mt-3 flex-wrap">
-      <survey-item />
-      <survey-item />
-      <survey-item />
+      <survey-item v-for="item in surveys" :key="item._id" :survey="item" />
     </div>
   </div>
 </template>
@@ -13,18 +11,13 @@
 import FilterLayout from "@/components/Filter.vue";
 import SurveyItem from "../components/SurveyItem.vue";
 export default {
-  async mounted() {
-    if (this.currentUser) {
-      if (!this.user)
-        await this.$store.dispatch("getUser", this.currentUser.id);
-    }
+  async created() {
+    if (!this.surveys.length) await this.$store.dispatch("getSurveys");
   },
   computed: {
-    currentUser() {
-      return this.$store.getters.currentUser;
-    },
-    user() {
-      return this.$store.getters.user;
+    
+    surveys() {
+      return this.$store.getters.surveys;
     },
   },
   components: {

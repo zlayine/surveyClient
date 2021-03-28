@@ -4,7 +4,7 @@
       <div class="percent" v-if="uploadPercent != null">
         {{ uploadPercent }}%
       </div>
-			<i-fa icon="circle-notch" spin />
+			<i-fa class="text-indigo-500" icon="circle-notch" spin />
     </div>
   </div>
 </template>
@@ -13,12 +13,10 @@
 export default {
   computed: {
     loading() {
-      // return this.$store.getters.loading;
-      return false;
+      return this.$store.getters.loading;
     },
     uploadPercent() {
-      // return this.$store.getters.uploadPercent;
-      return 23;
+      return this.$store.getters.uploadPercent;
     },
   },
 };
@@ -51,7 +49,6 @@ export default {
     }
 
     svg {
-			color: #2578af;
       font-size: 60px !important;
     }
   }

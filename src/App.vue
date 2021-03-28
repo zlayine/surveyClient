@@ -19,6 +19,20 @@ import Notification from "./components/Notification.vue";
 import FooterLayout from "./components/Footer.vue";
 
 export default {
+  async mounted() {
+    if (this.currentUser) {
+      if (!this.user)
+        await this.$store.dispatch("getUser", this.currentUser.id);
+    }
+  },
+  computed: {
+    currentUser() {
+      return this.$store.getters.currentUser;
+    },
+    user() {
+      return this.$store.getters.user;
+    },
+  },
   components: { Navbar, Notification, Loader, FooterLayout },
 };
 </script>
