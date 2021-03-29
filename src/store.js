@@ -49,6 +49,7 @@ const store = createStore({
 		uploadPercent: null,
 		socket: null,
 		surveys: [],
+		totalSurveys: 0,
 		users: [],
 		survey: null,
 		answers: [],
@@ -65,7 +66,8 @@ const store = createStore({
 		surveys: state => state.surveys,
 		users: state => state.users,
 		survey: state => state.survey,
-		answers: state => state.answers
+		answers: state => state.answers,
+		totalSurveys: state => state.totalSurveys
 	},
 	mutations: {
 		//LOGIN
@@ -122,7 +124,8 @@ const store = createStore({
 
 		//SURVEY
 		SET_SURVEYS(state, payload) {
-			state.surveys = payload;
+			state.surveys = payload.surveys;
+			state.totalSurveys = payload.totalPages;
 		},
 		UPDATE_SURVEYS(state, payload) {
 			state.surveys.push(payload);
@@ -215,21 +218,24 @@ const store = createStore({
 					data: {
 						query: `
 						query { 
-							getSurveys {
-								_id
-								name
-								description
-								answered
-								organization {
-									logo_url
+							getSurveys (page: ${data.page}, filter: "${data.filter}") {
+								totalPages
+								surveys {
+									_id
 									name
+									description
+									answered
+									organization {
+										logo_url
+										name
+									}
+									user {
+										username
+										image_url
+									}
+									totalQuestions
+									createdAt
 								}
-								user {
-									username
-									image_url
-								}
-								totalQuestions
-								createdAt
 							}
 						}
 						`

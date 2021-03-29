@@ -17,12 +17,18 @@
       <router-link class="link border-b-4 border-white hover:border-indigo-500" to="/admin">Admin panel</router-link>
     </div> -->
     <div class="nav_actions">
-      <router-link class="link border-b-4 border-white hover:border-indigo-500" to="/addsurvey">Create survey</router-link>
+      <router-link class="link border-white my-auto mr-5 ring p-2 rounded-xl text-white bg-indigo-500 shadow-lg hover:shadow-none transition-all" to="/addsurvey">
+        <i-fa class="text-white" icon="plus" />
+        Create Survey
+      </router-link>
       <div class="action flex flex-row" v-if="user">
         <div class="w-16 rounded-full shadow-md overflow-hidden">
           <img class="w-full" :src="user.image_url" alt="avatar-img" />
         </div>
-        <div class="ml-5 text-4xl my-auto cursor-pointer hover:text-gray-600 transition-all" @click="logout">
+        <div
+          class="ml-5 text-4xl my-auto cursor-pointer text-gray-800 hover:text-gray-600 transition-all"
+          @click="logout"
+        >
           <i-fa icon="sign-out-alt" />
         </div>
       </div>
@@ -112,7 +118,6 @@ export default {
       font-size: 22px;
       line-height: 25px;
       transition: 200ms all;
-     
     }
   }
 
@@ -132,9 +137,8 @@ export default {
     .link {
       font-weight: 600;
       text-decoration: none;
-      margin-right: 20px;
+      // margin-right: 20px;
       font-size: 19px;
-      margin: auto;
       cursor: pointer;
     }
   }

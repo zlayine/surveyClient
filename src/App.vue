@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     start() {
-      this.blackhole = true;
+      if (this.user) this.blackhole = true;
     },
   },
   computed: {
