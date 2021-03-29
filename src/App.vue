@@ -1,5 +1,8 @@
 <template>
   <div class="main bg-gray-100 flex flex-col relative min-h-screen">
+    <transition name="blackhole">
+      <blackhole v-if="blackhole" @done="blackhole = false" />
+    </transition>
     <navbar />
     <notification />
     <loader />
@@ -8,7 +11,7 @@
         <component :is="Component" />
       </transition>
     </router-view>
-    <footer-layout />
+    <footer-layout @start="start" />
   </div>
 </template>
 
@@ -17,13 +20,24 @@ import Loader from "./components/Loader.vue";
 import Navbar from "./components/Navbar.vue";
 import Notification from "./components/Notification.vue";
 import FooterLayout from "./components/Footer.vue";
+import Blackhole from "./components/Blackhole.vue";
 
 export default {
+  data() {
+    return {
+      blackhole: false,
+    };
+  },
   async mounted() {
     if (this.currentUser) {
       if (!this.user)
         await this.$store.dispatch("getUser", this.currentUser.id);
     }
+  },
+  methods: {
+    start() {
+      this.blackhole = true;
+    },
   },
   computed: {
     currentUser() {
@@ -33,17 +47,22 @@ export default {
       return this.$store.getters.user;
     },
   },
-  components: { Navbar, Notification, Loader, FooterLayout },
+  components: { Navbar, Notification, Loader, FooterLayout, Blackhole },
 };
 </script>
 
 <style>
+</style>
+
+<style>
 html {
+  width: 100%;
   height: 100%;
 }
 body {
   margin: 0;
   padding: 0;
+  width: 100%;
   height: 100%;
 }
 
@@ -51,13 +70,11 @@ body {
   font-family: "Open Sans", sans-serif;
   letter-spacing: 0px;
 }
-.fade-enter-active {
+.fade-enter-active,
+fade-leave-active {
   transition: opacity 0.2s;
 }
-.fade-leave-active {
-  transition: opacity 0.2s;
-}
-.fade-enter,
+.fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
@@ -68,7 +85,7 @@ body {
   max-height: 230px;
 }
 
-.expand-enter,
+.expand-enter-from,
 .expand-leave-to {
   opacity: 0;
   max-height: 0px;
@@ -80,8 +97,22 @@ body {
 .fade-out-leave-active {
   display: none;
 }
-.fade-out-enter,
+.fade-out-enter-from,
 .fade-out-leave-to {
+  opacity: 0;
+}
+
+.blackhole-enter-active {
+  transition: opacity 0.5s ease;
+}
+.blackhole-leave-active {
+  transition: opacity 3s ease;
+}
+
+.blackhole-enter-from {
+  opacity: 0;
+}
+.blackhole-leave-to {
   opacity: 0;
 }
 </style>

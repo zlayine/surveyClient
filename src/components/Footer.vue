@@ -1,7 +1,12 @@
 <template>
   <footer class="footer font-medium text-lg">
-		<!-- with <i-fa icon="brain" class="text-pink-500 text-2xl"/> -->
-    Made  for 1337
+    Made with
+    <i-fa
+      @click="$emit('start')"
+      icon="heart"
+      class="text-pink-500 text-2xl cursor-pointer"
+    />
+    for 1337
   </footer>
 </template>
 
@@ -13,10 +18,10 @@ export default {};
 .footer {
   padding: 20px;
   box-shadow: 0 0 5px #0202021a;
-	background-color: #fff;
+  background-color: #fff;
   width: 100%;
   position: absolute;
-	clear: both;
+  clear: both;
   bottom: 0;
   left: 0;
   text-align: center;
