@@ -25,7 +25,7 @@
             <select
               v-model="question.type"
               class="rounded-xl cursor-pointer text-lg font-bold text-white h-10 w-auto pl-5 pr-10 bg-green-400 border-none focus:outline-none appearance-none transition-all"
-              :class="{ 'bg-indigo-300': this.question != index }"
+              :class="{ 'bg-indigo-300': this.question != index, 'pointer-events-none': edit }"
             >
               <option value="0">Question type</option>
               <option value="choice">Choice</option>
@@ -36,7 +36,7 @@
             </select>
           </div>
         </div>
-        <div class="actions flex">
+        <div class="flex" v-if="!edit">
           <div
             class="mr-1 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-indigo-300 transition-all cursor-pointer"
             @click="duplicateQuestion"
@@ -87,6 +87,7 @@
             />
             <div class="flex-1 flex" v-else>
               <div
+                v-if="!option.name"
                 class="w-full flex rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer"
                 @click="launchFilePicker(index)"
               >
@@ -96,10 +97,11 @@
                 </div>
                 <img
                   v-if="option.url"
-                  class="h-12 w-20 object-contain"
+                  class="ml-2 h-12 w-20 object-contain"
                   :src="option.url"
-                  alt=""
+                  alt="image option"
                 />
+
                 <div
                   class="flex flex-1 p-2 justify-between m-auto"
                   v-if="option.url"
@@ -108,6 +110,16 @@
                   <div class="">{{ sizeFilter(option.size) }}</div>
                 </div>
               </div>
+              <div
+                class="w-full flex rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer"
+                v-else
+              >
+                <img
+                  class="ml-2 h-12 w-20 object-contain"
+                  :src="url_host + option.name"
+                  alt="image option"
+                />
+              </div>
               <input
                 type="file"
                 ref="file"
@@ -115,7 +127,7 @@
                 style="display: none"
               />
             </div>
-            <div class="ml-2 flex flex-row my-auto">
+            <div class="ml-2 flex flex-row my-auto" v-if="!edit">
               <div
                 class="mr-1 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-indigo-300 transition-all cursor-pointer"
                 @click="moveOption(index, 'up')"
@@ -137,8 +149,9 @@
             </div>
           </div>
           <button
-            v-show="typeChecker(question)"
+            v-show="typeChecker(question) && !edit"
             @click="addOption(question)"
+
             class="mt-2 ring ring-green-400 ring-opacity-30 border-green-400 border-opacity-50 focus:outline-none w-full rounded-xl p-2 text-lg text-green-400 transition-all"
           >
             <i-fa icon="plus" class="mr-1" />Add Option
@@ -148,6 +161,7 @@
     </div>
     <div class="flex justify-between">
       <div
+				v-if="!edit"
         @click="newQuestion"
         class="bg-green-400 text-xl rounded-full text-white w-12 h-12 shadow-xl mt-3 flex cursor-pointer hover:shadow-none transition-all"
       >
@@ -155,9 +169,17 @@
       </div>
       <div
         @click="saveQuestions"
+        v-if="!edit"
         class="bg-indigo-400 text-xl rounded-xl px-3 justify-center items-center text-white shadow-xl mt-3 flex cursor-pointer hover:shadow-none transition-all"
       >
         Save
+      </div>
+      <div
+        @click="updateQuestions"
+        v-else-if="surveyEdit || edit"
+        class="bg-green-400 text-xl rounded-xl py-2 px-5 justify-center items-center text-white shadow-xl mt-3 flex cursor-pointer hover:shadow-none transition-all"
+      >
+        Update
       </div>
     </div>
   </div>
@@ -165,11 +187,13 @@
 
 <script>
 export default {
-  emits: ["save", "updated"],
+  props: ["edit"],
+  emits: ["save", "updated", "update"],
   data() {
     return {
       question: 0,
       option: null,
+      url_host: import.meta.env.VITE_API_HOST,
       changed: true,
       questions: [
         {
@@ -202,12 +226,15 @@ export default {
       this.changed = false;
       this.$emit("save", this.questions);
     },
+		updateQuestions(){
+      this.changed = false;
+      this.$emit("update", this.questions);
+		},
     selectQuestion(index) {
       this.question = index;
     },
     typeChecker(question) {
-      if (question.type == "text" && question.options.length > 0)
-        return false;
+      if (question.type == "text" && question.options.length > 0) return false;
       else if (question.type == "image" && question.options.length > 2)
         return false;
       else if (question.type == "rate" && question.options.length > 9)
@@ -275,7 +302,29 @@ export default {
       return parseFloat(val).toFixed(1) + "MB";
     },
   },
-  computed: {},
+  computed: {
+    surveyEdit() {
+      let survey = this.$store.getters.survey;
+      if (this.edit && this.$store.getters.survey) {
+        this.questions = survey.questions.map((q) => {
+          q.type = q.question_type.type;
+          return q;
+        });
+      } else {
+        this.questions = [
+          {
+            type: "choice",
+            options: [
+              {
+                name: null,
+              },
+            ],
+          },
+        ];
+      }
+      return null;
+    },
+  },
 };
 </script>
 

@@ -42,6 +42,14 @@ const routes = [
 		}
 	},
 	{
+		path: "/editsurvey/:id",
+		name: "editsurvey",
+		component: CreateSurvey,
+		meta: {
+			requiresAuth: true,
+		}
+	},
+	{
 		path: "/admin",
 		name: "admin",
 		component: Admin,

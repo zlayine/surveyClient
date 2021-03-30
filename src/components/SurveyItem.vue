@@ -3,14 +3,16 @@
     <div
       class="bg-white w-full flex flex-row p-2 rounded-lg shadow-xl h-56 relative overflow-hidden"
     >
-      <div
-        class="absolute w-10 h-10 bg-indigo-200 rounded-lg -right-1 -top-1 flex justify-center cursor-pointer shadow-lg hover:shadow-none transition-all"
-      >
-        <i-fa
-          class="text-indigo-600 text-xl mt-auto mr-auto ml-2 mb-2"
-          icon="edit"
-        />
-      </div>
+      <router-link :to="`/editsurvey/${survey._id}`">
+        <button
+          class="absolute w-10 h-10 focus:outline-none outline-none bg-indigo-200 rounded-lg -right-1 -top-1 flex justify-center cursor-pointer shadow-lg hover:shadow-none transition-all"
+        >
+          <i-fa
+            class="text-indigo-600 text-xl mt-auto mr-auto ml-2 mb-2"
+            icon="edit"
+          />
+        </button>
+      </router-link>
       <div
         class="user w-28 flex mb-auto rounded-full overflow-hidden shadow-md mx-5"
       >
@@ -113,6 +115,7 @@ export default {
   data() {
     return {
       logo1337: logo,
+      url_host: import.meta.env.VITE_API_HOST,
     };
   },
   methods: {

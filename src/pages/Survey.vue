@@ -73,12 +73,12 @@ export default {
       if (--this.current < 0) this.current = 0;
     },
     async getSurvey() {
-      if (!this.survey)
-        await this.$store.dispatch("getSurvey", this.$route.params.id);
+      await this.$store.dispatch("getSurvey", this.$route.params.id);
       if (!this.survey) this.$router.push("/");
     },
     submit() {
       this.$store.dispatch("submitAnswers", this.answers);
+      this.$router.push("/");
     },
   },
   async created() {

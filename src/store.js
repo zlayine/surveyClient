@@ -138,6 +138,9 @@ const store = createStore({
 		DELETE_SURVEY(state, payload) {
 			state.surveys = state.surveys.filter(s => s._id != payload);
 		},
+		CLEAR_SURVEY(state) {
+			state.survey = null;
+		},
 		UPDATE_SURVEY_STATS(state, payload) {
 			payload.questions = payload.questions.map(q => {
 				q.totalAnswers = q.answers.length;
@@ -251,7 +254,6 @@ const store = createStore({
 									_id
 									name
 									description
-									answered
 									organization {
 										logo_url
 										name
@@ -453,6 +455,52 @@ const store = createStore({
 				commit("UPDATE_LOADING")
 			}
 		},
+		async getSurveyEdit({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						query { 
+							getSurvey(id: "${data}") {
+								_id	
+								name
+								description
+								campus
+								organization {
+									_id
+									name
+									logo_url
+								}
+								questions {
+									_id
+									name
+									question_type {
+										_id
+										type
+									}
+									options {
+										_id
+										name
+									}
+								}
+								totalQuestions
+								createdAt
+							}
+						}
+						`
+					}
+				});
+				commit('UPDATE_SURVEY', res.data.data.getSurvey);
+				commit("UPDATE_LOADING");
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to get survey edit: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
 		async getSurveyAnswers({ commit }, data) {
 			try {
 				commit("UPDATE_LOADING")
@@ -466,6 +514,7 @@ const store = createStore({
 								_id
 								name
 								description
+								answers
 								organization {
 									logo_url
 									name
@@ -507,7 +556,52 @@ const store = createStore({
 				commit("SET_NOTIFICATION", { msg: "Failed to get answers: " + error, error: 1 });
 				commit("UPDATE_LOADING")
 			}
-		}
+		},
+		async updateQuestions({ commit }, data) {
+			try {
+				// console.log(data);
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+							mutation UpdateQuestions(
+								$input: [QuestionUpdateInput!]!) { 
+								updateQuestions (id: "${data.id}", questions: $input)
+							}
+					`, variables: {
+							input: data.questions
+						}
+					},
+				});
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to update questions: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async updateSurvey({ commit }, data) {
+			try {
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+							mutation UpdateSurevy(
+								$input: SurveyUpdateInput!) { 
+								updateSurvey (input: $input)
+							}
+					`, variables: {
+							input: data
+						}
+					},
+				});
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to update survey: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
 	}
 })
 

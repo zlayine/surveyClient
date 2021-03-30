@@ -21,9 +21,9 @@
     </label>
     <label class="block sm:w-1/2 mb-3">
       <span class="text-gray-700">Organization</span>
-      <div class="flex w-full sm:w-2/3 relative">
+      <div class="flex w-full sm:w-2/3 relative" v-if="!edit">
         <div
-          class="flex justify-center items-center text-black text-xl w-1/2 h-full rounded-xl mt-1 ml-2 cursor-pointer shadow-md bg-white border border-gray-100 hover:shadow-none transition-all ring-indigo-300"
+          class="flex justify-center items-center text-black text-xl w-1/2 h-full rounded-xl mt-1 cursor-pointer shadow-md bg-white border border-gray-100 hover:shadow-none transition-all ring-indigo-300"
           :class="{ ring: survey.organization == '1337' }"
           @click="survey.organization = defaultOrg"
         >
@@ -67,12 +67,36 @@
           Add
         </div>
       </div>
+      <div class="flex w-full sm:w-2/3 relative" v-else>
+        <div
+          v-if="!survey.organization"
+          class="flex justify-center ring items-center text-black text-xl w-1/2 h-full rounded-xl mt-1 cursor-pointer shadow-md bg-white border border-gray-100 hover:shadow-none transition-all ring-indigo-300"
+        >
+          <div class="w-20 bg-white m-1">
+            <img class="m-auto h-9" :src="logo1337" alt="img 1337" />
+          </div>
+        </div>
+
+        <div
+          v-else-if="survey.organization.logo_url"
+          class="flex justify-center ring items-center text-sm text-black w-1/2 h-full rounded-xl mt-1 cursor-pointer shadow-md bg-white border border-gray-100 hover:shadow-none transition-all ring-indigo-300 max-h-11 relative z-10"
+        >
+          <div class="w-10 bg-white m-1">
+            <img
+              class="my-auto h-9"
+              :src="url_host + survey.organization.logo_url"
+              alt="img org"
+            />
+          </div>
+          {{ survey.organization.name }}
+        </div>
+      </div>
     </label>
     <label class="block sm:w-1/2 mb-5">
       <span class="text-gray-700">Campus</span>
       <div class="flex w-full">
         <div
-          class="flex justify-center items-center text-lg text-black w-1/3 h-full p-2 rounded-xl mt-1 ml-2 cursor-pointer shadow-md bg-white border border-gray-100 hover:shadow-none transition-all ring-indigo-300 max-h-11 overflow-hidden"
+          class="flex justify-center items-center text-lg text-black w-1/3 h-full p-2 rounded-xl mt-1 cursor-pointer shadow-md bg-white border border-gray-100 hover:shadow-none transition-all ring-indigo-300 max-h-11 overflow-hidden"
           :class="{ ring: survey.campus == 'All' }"
           @click="survey.campus = 'All'"
         >
@@ -94,21 +118,39 @@
         </div>
       </div>
     </label>
-    <button
-      @click="$emit('save', survey)"
-      class="bg-green-400 rounded-xl px-6 py-2 text-white shadow-md focus:outline-none hover:shadow-none transition-all"
-    >
-      Save
-    </button>
-    <div class="flex flex-col w-full justify-center items-center mt-5">
-      <span class="mb-2">Ready to publish ?</span>
+    <div class="w-1/2 flex justify-between">
       <button
-        @click="$emit('publish')"
-        class="bg-indigo-400 rounded-xl px-6 py-1 text-white shadow-md text-lg focus:outline-none hover:shadow-none transition-all"
+        @click="$emit('save', survey)"
+        v-if="!edit"
+        class="bg-green-400 rounded-xl mt-auto px-6 py-2 text-white shadow-md focus:outline-none hover:shadow-none transition-all"
       >
-        Publish
+        Save
+      </button>
+      <div class="flex flex-col justify-center items-center mt-5" v-if="!edit">
+        <span class="mb-2">Ready to publish ?</span>
+        <button
+          @click="$emit('publish')"
+          class="bg-indigo-400 rounded-xl px-6 py-1 text-white shadow-md text-lg focus:outline-none hover:shadow-none transition-all"
+        >
+          Publish
+        </button>
+      </div>
+      <button
+        @click="$emit('update', survey)"
+        v-if="edit"
+        class="bg-green-400 rounded-xl px-6 py-2 text-white shadow-md focus:outline-none hover:shadow-none transition-all"
+      >
+        Update
+      </button>
+      <button
+        @click="$emit('delete')"
+        v-if="surveyEdit || edit"
+        class="bg-red-500 rounded-xl px-6 py-2 text-white shadow-md focus:outline-none hover:shadow-none transition-all"
+      >
+        Delete
       </button>
     </div>
+
     <create-organization
       v-show="show"
       @save="saveOrganization"
@@ -122,17 +164,18 @@ import CreateOrganization from "../components/CreateOrganization.vue";
 import logo from "@/assets/1337.svg";
 
 export default {
-  emits: ["save", "publish"],
+  props: ["edit"],
+  emits: ["save", "publish", "update"],
   data() {
     return {
       show: false,
       logo1337: logo,
-      defaultOrg: '1337',
+      defaultOrg: "1337",
       url_host: import.meta.env.VITE_API_HOST,
       survey: {
         name: null,
         description: null,
-        organization: '1337',
+        organization: !this.edit ? "1337" : null,
         campus: "All",
       },
     };
@@ -141,6 +184,24 @@ export default {
     saveOrganization() {},
   },
   computed: {
+    surveyEdit() {
+      let survey = this.$store.getters.survey;
+      if (this.edit && this.$store.getters.survey) {
+        this.survey._id = survey._id;
+        this.survey.name = survey.name;
+        this.survey.description = survey.description;
+        this.survey.campus = survey.campus;
+        this.survey.organization = survey.organization;
+      } else {
+        this.survey = {
+          name: null,
+          description: null,
+          organization: "1337",
+          campus: "All",
+        };
+      }
+      return null;
+    },
     user() {
       return this.$store.getters.user;
     },

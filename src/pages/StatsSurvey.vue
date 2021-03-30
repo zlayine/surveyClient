@@ -3,34 +3,49 @@
     <div
       class="flex flex-col w-full bg-white ring-1 mb-5 ring-gray-300 ring-opacity-50 shadow-lg rounded-xl p-5 overflow-hidden"
     >
-      <div class="flex justify-between relative" v-if="survey">
+      <div class="flex justify-between relative mb-4" v-if="survey">
         <div class="text-2xl capitalize">{{ survey.answers }} answers</div>
-        <div
-          class="absolute w-10 h-10 bg-indigo-200 rounded-lg -right-6 -top-6 flex justify-center cursor-pointer shadow-lg hover:shadow-none transition-all"
-        >
-          <i-fa
-            class="text-indigo-600 text-xl mt-auto mr-auto ml-2 mb-2"
-            icon="edit"
-          />
-        </div>
+        <router-link :to="`/editsurvey/${survey._id}`">
+          <button
+            class="absolute w-10 h-10 bg-indigo-200 outline-none focus:outline-none rounded-lg -right-6 -top-6 flex justify-center cursor-pointer shadow-lg hover:shadow-none transition-all"
+          >
+            <i-fa
+              class="text-indigo-600 text-xl mt-auto mr-auto ml-2 mb-2"
+              icon="edit"
+            />
+          </button>
+        </router-link>
       </div>
-      <div class="owner">
-        <!-- <div
-          class="user w-28 flex mb-auto rounded-full overflow-hidden shadow-md mx-5"
+      <div class="flex" v-if="survey">
+        <div
+          class="w-16 flex mb-auto rounded-full overflow-hidden shadow-md mx-5"
         >
           <img
             class="w-full"
             v-if="survey.organization"
-            :src="survey.organization.logo_url"
+            :src="url_host + survey.organization.logo_url"
             alt="user img"
           />
           <img
-            class="w-28 h-28 p-3 border border-gray-100 overflow-hidden rounded-full"
+            class="w-16 h-16 p-3 border border-gray-100 overflow-hidden rounded-full"
             v-else
             :src="logo1337"
             alt="user img"
           />
-        </div> -->
+        </div>
+        <div class="my-auto">
+          <div class="title text-xl uppercase font-bold tracking-wider l">
+            {{ survey.name }}
+          </div>
+          <div class="subtitle flex mb-1">
+            <h6 class="username mr-1 text-gray-500">
+              {{ survey.user.username }}
+            </h6>
+            <h6 class="date text-gray-600">
+              at {{ formatDate(survey.createdAt) }}
+            </h6>
+          </div>
+        </div>
       </div>
       <nav class="flex flex-row w-full">
         <div class="flex-1 flex flex-col items-center justify-center">
@@ -68,18 +83,24 @@
 <script>
 import StatsIndividual from "../components/StatsIndividual.vue";
 import StatsSummary from "../components/StatsSummary.vue";
+import logo from "@/assets/1337.svg";
+import moment from "moment";
 
 export default {
   data() {
     return {
       selected: null,
+      logo1337: logo,
+      url_host: import.meta.env.VITE_API_HOST,
     };
   },
   methods: {
     async getStats() {
-      if (!this.survey)
-        await this.$store.dispatch("getSurveyAnswers", this.$route.params.id);
-      // if (!this.survey) this.$router.push("/");
+      await this.$store.dispatch("getSurveyAnswers", this.$route.params.id);
+      if (!this.survey) this.$router.push("/");
+    },
+    formatDate(val) {
+      return moment(String(val)).format("DD/MM/YYYY");
     },
   },
   async created() {
