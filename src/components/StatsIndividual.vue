@@ -113,31 +113,10 @@ export default {
   },
   computed: {
     questions() {
-      let answers = this.$store.getters.answers;
-      if (answers.length) this.question = answers[0];
-      return this.$store.getters.answers;
+      let questions = this.$store.getters.statsQuestions;
+      if (questions.length) this.question = questions[0];
+      return questions;
     },
-    // groupedAnswers() {
-    //   if (!this.question) return [];
-    //   let answers = this.question.answers;
-    //   let grouped = answers.reduce((obj, i) => {
-    //     if (this.question.question_type.type == "text")
-    //       (obj[i["answer_text"]] = obj[i["answer_text"]] || []).push(i);
-    //     else
-    //       (obj[i["question_option"]["_id"]] =
-    //         obj[i["question_option"]["_id"]] || []).push(i);
-    //     return obj;
-    //   }, {});
-    //   let sort = Object.entries(grouped)
-    //     .reduce((arr, [k, v]) => {
-    //       arr.push(v);
-    //       return arr;
-    //     }, [])
-    //     .sort((a, b) => {
-    //       return b.length - a.length;
-    //     });
-    //   return sort;
-    // },
   },
   components: { SurveyQuestionOption },
 };

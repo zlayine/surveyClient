@@ -4,12 +4,11 @@
       class="bg-white w-full flex flex-row p-2 rounded-lg shadow-xl h-56 relative overflow-hidden"
     >
       <div
-        class="absolute w-10 h-10 bg-red-500 rounded-lg -right-1 -top-1 flex justify-center cursor-pointer shadow-lg hover:shadow-none transition-all"
-        @click="deleteSurvey"
+        class="absolute w-10 h-10 bg-indigo-200 rounded-lg -right-1 -top-1 flex justify-center cursor-pointer shadow-lg hover:shadow-none transition-all"
       >
         <i-fa
-          class="text-white text-xl mt-auto mr-auto ml-2 mb-2"
-          icon="trash"
+          class="text-indigo-600 text-xl mt-auto mr-auto ml-2 mb-2"
+          icon="edit"
         />
       </div>
       <div
@@ -21,7 +20,7 @@
           :src="survey.organization.logo_url"
           alt="user img"
         />
-				<img
+        <img
           class="w-28 h-28 p-3 border border-gray-100 overflow-hidden rounded-full"
           v-else
           :src="logo1337"
@@ -32,16 +31,35 @@
         <div class="title text-xl uppercase font-bold tracking-wider l">
           {{ survey.name }}
         </div>
-        <div class="subtitle flex mb-2.5">
+        <div class="subtitle flex mb-1">
           <h6 class="username mr-1 text-gray-500">
             {{ survey.user.username }}
           </h6>
           <h6 class="date text-gray-600">{{ formatDate(survey.createdAt) }}</h6>
         </div>
+        <div class="flex mb-2.5" v-if="user && user._id == survey.user._id">
+          <span
+            class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-green-600 bg-green-200 mr-2"
+            v-if="survey.campus != 'Benguerir'"
+          >
+            Khouribga
+          </span>
+          <span
+            class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-green-600 bg-green-200 mr-2"
+            v-if="survey.campus != 'Khouribga'"
+          >
+            Benguerir
+          </span>
+          <span
+            class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-indigo-600 bg-indigo-200 mr-2"
+          >
+            10 answers
+          </span>
+        </div>
         <div class="description break-words">
           {{ survey.description }}
         </div>
-        <div class="pt-1 mt-auto" v-if="start">
+        <!-- <div class="pt-1 mt-auto" >
           <div class="flex mb-2 items-center justify-between">
             <div>
               <span
@@ -64,8 +82,8 @@
               class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
             ></div>
           </div>
-        </div>
-        <div class="flex justify-center mt-auto mx-auto mb-4" v-else>
+        </div> -->
+        <div class="flex justify-center mt-auto mx-auto mb-4">
           <router-link :to="`/survey/${survey._id}`">
             <button
               class="bg-green-500 text-white w-40 rounded-lg text-xl px-5 py-1 shadow-md hover:shadow-none focus:outline-none transition-all"
@@ -94,8 +112,8 @@ export default {
   props: ["survey"],
   data() {
     return {
-			logo1337: logo
-		};
+      logo1337: logo,
+    };
   },
   methods: {
     formatDate(val) {
@@ -106,24 +124,8 @@ export default {
     },
   },
   computed: {
-    answers() {
-      return this.$store.getters.answers;
-    },
-    ASurvey() {
-      return this.$store.getters.survey;
-    },
-    start() {
-      if (!this.ASurvey) return false;
-      if (this.ASurvey._id == this.survey._id && this.answers.length)
-        return true;
-      return false;
-    },
-    progress() {
-      if (this.start)
-        return parseInt(
-          (this.answers.length / this.survey.totalQuestions) * 100
-        );
-      return 0;
+    user() {
+      return this.$store.getters.user;
     },
   },
 };

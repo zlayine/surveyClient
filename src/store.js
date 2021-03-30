@@ -52,7 +52,8 @@ const store = createStore({
 		totalSurveys: 0,
 		users: [],
 		survey: null,
-		answers: [],
+		surveyStats: null,
+		statsQuestions: [],
 	},
 	getters: {
 		user: state => state.user,
@@ -66,7 +67,8 @@ const store = createStore({
 		surveys: state => state.surveys,
 		users: state => state.users,
 		survey: state => state.survey,
-		answers: state => state.answers,
+		surveyStats: state => state.surveyStats,
+		statsQuestions: state => state.statsQuestions,
 		totalSurveys: state => state.totalSurveys
 	},
 	mutations: {
@@ -136,8 +138,8 @@ const store = createStore({
 		DELETE_SURVEY(state, payload) {
 			state.surveys = state.surveys.filter(s => s._id != payload);
 		},
-		UPDATE_ANSWERS(state, payload) {
-			payload = payload.map(q => {
+		UPDATE_SURVEY_STATS(state, payload) {
+			payload.questions = payload.questions.map(q => {
 				q.totalAnswers = q.answers.length;
 				let grouped = q.answers.reduce((obj, i) => {
 					if (q.question_type.type == "text")
@@ -158,7 +160,8 @@ const store = createStore({
 				q.answers = sort;
 				return q;
 			})
-			state.answers = payload;
+			state.surveyStats = payload;
+			state.statsQuestions = payload.questions;
 		}
 	},
 	actions: {
@@ -254,6 +257,7 @@ const store = createStore({
 										name
 									}
 									user {
+										_id
 										username
 										image_url
 									}
@@ -285,7 +289,6 @@ const store = createStore({
 						query { 
 							getSurvey(id: "${data}") {
 								_id					
-								answered			
 								questions {
 									_id
 									name
@@ -329,7 +332,6 @@ const store = createStore({
 							createSurvey (input: $input){
 								_id
 								name
-								answered
 								description
 								organization {
 									logo_url
@@ -463,26 +465,41 @@ const store = createStore({
 							getSurveyAnswers(id: "${data}") {
 								_id
 								name
-								question_type {
-									type
-								}
-								options {
+								description
+								organization {
+									logo_url
 									name
 								}
-								answers {
+								user {
+									username
+									image_url
+								}
+								totalQuestions
+								createdAt
+								questions {
 									_id
-									question_option {
-										_id
+									name
+									question_type {
+										type
+									}
+									options {
 										name
 									}
-									answer_text
+									answers {
+										_id
+										question_option {
+											_id
+											name
+										}
+										answer_text
+									}
 								}
 							}
 						}
 						`
 					}
 				});
-				commit('UPDATE_ANSWERS', res.data.data.getSurveyAnswers);
+				commit('UPDATE_SURVEY_STATS', res.data.data.getSurveyAnswers);
 				commit("UPDATE_LOADING");
 				return "success";
 			} catch (error) {

@@ -50,7 +50,9 @@ export default {
   },
   computed: {
     questions() {
-      return this.$store.getters.answers;
+      if (this.$store.getters.statsQuestions)
+        return this.$store.getters.statsQuestions;
+      return [];
     },
   },
   components: {
