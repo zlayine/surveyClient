@@ -11,11 +11,12 @@
 
 <script>
 export default {
+  props: ["data", "names"],
   data() {
     return {
       series: [
         {
-          data: [5, 2],
+          data: this.data ? this.data : [],
         },
       ],
       chartOptions: {
@@ -39,7 +40,7 @@ export default {
           enabled: false,
         },
         xaxis: {
-          categories: ["Yes", "No"],
+          categories: this.names ? this.names : [],
         },
       },
     };

@@ -11,9 +11,10 @@
 
 <script>
 export default {
+  props: ["data", "names"],
   data() {
     return {
-      series: [44, 55, 13, 43, 22],
+      series: this.data ? this.data : [],
       chartOptions: {
         chart: {
           width: 380,
@@ -25,7 +26,7 @@ export default {
         tooltip: {
           enabled: false,
         },
-        labels: ["Team A", "Team B", "Team C", "Team D", "Team E"],
+        labels: this.names ? this.names : [],
         responsive: [
           {
             breakpoint: 480,

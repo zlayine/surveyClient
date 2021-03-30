@@ -4,7 +4,7 @@
       class="flex flex-col w-full bg-white ring-1 mb-5 ring-gray-300 ring-opacity-50 shadow-lg rounded-xl p-5"
     >
       <div class="flex justify-between">
-        <div class="text-2xl">1 answers</div>
+        <div class="text-2xl capitalize">{{ totalAnswers }} answers</div>
         <div class="actions">
           <i-fa class="" icon="ellipsis-v" />
         </div>
@@ -49,8 +49,27 @@ import StatsSummary from "../components/StatsSummary.vue";
 export default {
   data() {
     return {
-      selected: 1,
+      selected: 0,
     };
+  },
+  methods: {
+    async getAnswers() {
+      if (!this.answers.length)
+        await this.$store.dispatch("getSurveyAnswers", this.$route.params.id);
+      if (!this.answers.length) this.$router.push("/");
+    },
+  },
+  async created() {
+    if (!this.answers.length) await this.getAnswers();
+  },
+  computed: {
+    answers() {
+      return this.$store.getters.answers;
+    },
+    totalAnswers() {
+      if (this.answers.length)
+        return this.answers.reduce((arr, i) => arr + i.answers.length, 0);
+    },
   },
   components: {
     StatsSummary,

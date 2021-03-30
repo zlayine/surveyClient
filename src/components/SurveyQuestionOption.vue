@@ -42,13 +42,13 @@
       {{ item.name }}
     </div>
   </template>
-  <template v-else-if="type == 'text'">
+  <template v-else-if="type == 'text' && !disabled">
     <textarea
       class="block w-full mt-3 rounded-lg text-xl border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
       :disabled="disabled"
       rows="6"
       v-model="input"
-      @input="$emit('input', input)"
+      @input="$emit('input', { id: item._id, input: input })"
       :placeholder="item.name"
     ></textarea>
   </template>
@@ -86,6 +86,7 @@ export default {
   methods: {},
   computed: {
     selected() {
+      if (this.disabled) return false;
       if (this.type != "multiple") return this.item == this.select[0];
       else return this.select.filter((s) => s == item).length;
     },

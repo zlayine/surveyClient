@@ -135,6 +135,30 @@ const store = createStore({
 		},
 		DELETE_SURVEY(state, payload) {
 			state.surveys = state.surveys.filter(s => s._id != payload);
+		},
+		UPDATE_ANSWERS(state, payload) {
+			payload = payload.map(q => {
+				q.totalAnswers = q.answers.length;
+				let grouped = q.answers.reduce((obj, i) => {
+					if (q.question_type.type == "text")
+						(obj[i["answer_text"]] = obj[i["answer_text"]] || []).push(i);
+					else
+						(obj[i["question_option"]["_id"]] =
+							obj[i["question_option"]["_id"]] || []).push(i);
+					return obj;
+				}, {});
+				let sort = Object.entries(grouped)
+					.reduce((arr, [k, v]) => {
+						arr.push(v);
+						return arr;
+					}, [])
+					.sort((a, b) => {
+						return b.length - a.length;
+					});
+				q.answers = sort;
+				return q;
+			})
+			state.answers = payload;
 		}
 	},
 	actions: {
@@ -424,6 +448,46 @@ const store = createStore({
 			} catch (error) {
 				console.log(error)
 				commit("SET_NOTIFICATION", { msg: "Failed to remove organization: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async getSurveyAnswers({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						query { 
+							getSurveyAnswers(id: "${data}") {
+								_id
+								name
+								question_type {
+									type
+								}
+								options {
+									name
+								}
+								answers {
+									_id
+									question_option {
+										_id
+										name
+									}
+									answer_text
+								}
+							}
+						}
+						`
+					}
+				});
+				commit('UPDATE_ANSWERS', res.data.data.getSurveyAnswers);
+				commit("UPDATE_LOADING");
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to get answers: " + error, error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		}

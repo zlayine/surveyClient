@@ -27,7 +27,6 @@ export default {
   data() {
     return {
       selected: [],
-      input: null,
     };
   },
   methods: {
@@ -42,8 +41,9 @@ export default {
       }
       this.$emit("select", this.selected);
     },
-    setInput(input) {
-      this.input = input;
+    setInput({ id, input }) {
+      this.selected = [{ _id: id, name: input }];
+      this.$emit("select", this.selected);
     },
   },
   components: { SurveyQuestionOption },

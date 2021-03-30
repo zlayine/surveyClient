@@ -119,7 +119,7 @@ export default {
         });
       if (this.infoValid && this.questionsValid) {
         let res = await this.$store.dispatch("createSurvey", obj);
-				this.$router.push('/');
+				// this.$router.push('/');
       }
     },
   },
