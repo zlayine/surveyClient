@@ -1,10 +1,14 @@
 <template>
   <div class="container mx-auto pt-5 px-3 sm:px-10 mb-32">
     <filter-layout @change="changeFilter" :current="filter" />
+    <div class="w-full sm:w-1/4 mx-auto" v-if="!surveys.length">
+      <img class="w-full" :src="empty_img" alt="empty image" />
+			<div class="text-center mt-2 text-xl">No surveys around this corner..</div>
+    </div>
     <div class="flex flex-row justify-between mt-3 flex-wrap">
       <survey-item v-for="item in surveys" :key="item._id" :survey="item" />
     </div>
-    <div class="py-2 mt-10">
+    <div class="py-2 mt-10" v-if="pages > 1">
       <nav class="block">
         <ul class="flex pl-0 rounded list-none justify-center flex-wrap">
           <div
@@ -42,10 +46,13 @@
 
 <script>
 import FilterLayout from "@/components/Filter.vue";
-import SurveyItem from "../components/SurveyItem.vue";
+import SurveyItem from "@/components/SurveyItem.vue";
+import emptyImage from "@/assets/empty_img.svg";
+
 export default {
   data() {
     return {
+      empty_img: emptyImage,
       filter: "new",
       page: 1,
     };

@@ -6,7 +6,7 @@
       <select
         v-model="selected"
         @change="setQuestion"
-        class="block w-2/3 mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+        class="block w-full sm:w-2/3 mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
       >
         <option v-for="(q, index) in questions" :key="index" :value="index">
           {{ q.name }}

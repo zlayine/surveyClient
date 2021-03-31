@@ -1,13 +1,13 @@
 <template>
-  <div class="w-3/5 mx-auto py-5 px-10 flex flex-col mb-32">
+  <div class="sm:w-3/5 mx-auto py-5 px-3 sm:px-10 flex flex-col mb-32">
     <div
-      class="flex flex-col w-full bg-white ring-1 mb-5 ring-gray-300 ring-opacity-50 shadow-lg rounded-xl p-5 overflow-hidden"
+      class="flex flex-col w-full bg-white ring-1 mb-5 ring-gray-300 ring-opacity-50 shadow-lg rounded-xl p-3 sm:p-5 overflow-hidden"
     >
       <div class="flex justify-between relative mb-4" v-if="survey">
         <div class="text-2xl capitalize">{{ survey.answers }} answers</div>
         <router-link :to="`/editsurvey/${survey._id}`">
           <button
-            class="absolute w-10 h-10 bg-indigo-200 outline-none focus:outline-none rounded-lg -right-6 -top-6 flex justify-center cursor-pointer shadow-lg hover:shadow-none transition-all"
+            class="absolute w-10 h-10 bg-indigo-200 outline-none focus:outline-none rounded-bl-lg -right-4 -top-4 sm:-right-6 sm:-top-6 flex justify-center cursor-pointer shadow-lg hover:shadow-none transition-all"
           >
             <i-fa
               class="text-indigo-600 text-xl mt-auto mr-auto ml-2 mb-2"
@@ -16,12 +16,12 @@
           </button>
         </router-link>
       </div>
-      <div class="flex" v-if="survey">
+      <div class="flex mb-3" v-if="survey">
         <div
-          class="w-16 flex mb-auto rounded-full overflow-hidden shadow-md mx-5"
+          class="w-16 flex mb-auto rounded-full overflow-hidden shadow-md mr-3 sm:mr-5"
         >
           <img
-            class="w-full"
+            class="w-16 h-16 overflow-hidden rounded-full"
             v-if="survey.organization"
             :src="url_host + survey.organization.logo_url"
             alt="user img"
@@ -33,8 +33,10 @@
             alt="user img"
           />
         </div>
-        <div class="my-auto">
-          <div class="title text-xl uppercase font-bold tracking-wider l">
+        <div class="flex flex-1 flex-col my-auto">
+          <div
+            class="text-sm sm:text-xl uppercase font-bold tracking-wider break-words"
+          >
             {{ survey.name }}
           </div>
           <div class="subtitle flex mb-1">

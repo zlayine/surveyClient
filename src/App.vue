@@ -4,8 +4,12 @@
       <blackhole v-if="blackhole" @done="blackhole = false" />
     </transition>
     <navbar />
-    <notification />
-    <loader />
+    <transition name="slide">
+      <notification />
+    </transition>
+    <transition name="fade">
+      <loader />
+    </transition>
     <router-view v-slot="{ Component }">
       <transition name="fade-out">
         <component :is="Component" />
@@ -73,6 +77,7 @@ body {
 .fade-enter-active,
 fade-leave-active {
   transition: opacity 0.2s;
+	opacity: 1;
 }
 .fade-enter-from,
 .fade-leave-to {
@@ -100,6 +105,16 @@ fade-leave-active {
 .fade-out-enter-from,
 .fade-out-leave-to {
   opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.2s;
+	top: 0;
+}
+.slide-enter-from,
+.slide-leave-to {
+  top: -100px;
 }
 
 .blackhole-enter-active {

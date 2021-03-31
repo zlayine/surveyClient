@@ -1,8 +1,8 @@
 <template>
   <template v-if="type == 'choice'">
-    <div class="w-1/2">
+    <div class="w-full sm:w-1/2">
       <div
-        class="w-auto ring ring-indigo-300 ring-opacity-50 rounded-xl bg-white text-center text-xl px-5 py-10 m-3 cursor-pointer hover:bg-indigo-100 hover:text-indigo-400 transition-all"
+        class="w-auto ring ring-indigo-300 ring-opacity-50 rounded-xl bg-white text-center text-xl px-2 py-4 sm:px-5 sm:py-10 m-3 cursor-pointer hover:bg-indigo-100 hover:text-indigo-400 transition-all"
         :class="{
           'bg-indigo-100': selected,
           'text-indigo-400': selected,
@@ -44,7 +44,7 @@
   </template>
   <template v-else-if="type == 'text' && !disabled">
     <textarea
-      class="block w-full mt-3 rounded-lg text-xl border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+      class="block w-full mt-3 rounded-lg text-xl border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 mx-3 sm:mx-0"
       :disabled="disabled"
       rows="6"
       v-model="input"
@@ -53,7 +53,7 @@
     ></textarea>
   </template>
   <template v-else-if="type == 'image'">
-    <div class="w-1/3 p-3 relative flex">
+    <div class="sm:w-1/3 p-3 relative flex">
       <img
         class="w-auto m-auto object-contain max-h-80 overflow-hidden rounded-lg ring ring-indigo-300 ring-opacity-50 cursor-pointer transition-all"
         :class="{ 'filter-blur': selected, 'pointer-events-none': disabled }"

@@ -5,7 +5,7 @@
       <div class="wp" :class="{ start: start }">
         <div class="blackhole" :class="{ explode: finish, start: start }"></div>
         <transition name="fade">
-          <div class="planet" :class="{ start: start }">
+          <div class="planet" :class="{ start: start }" v-if="user">
             <img class="rounded-full" :src="user.image_url" alt="img user" />
           </div>
         </transition>
@@ -50,7 +50,7 @@ export default {
 
 <style lang="css">
 .b1337 {
-  position: absolute;
+  position: fixed;
   z-index: 1000;
   width: 100%;
   height: 100%;
@@ -168,10 +168,10 @@ export default {
     opacity: 1;
   }
   to {
-    top: 50%;
-    left: 50%;
+    top: 0%;
+    left: 0%;
     opacity: 0;
-    transform: scale(0.3);
+    transform: scale(0.1);
   }
 }
 
@@ -190,17 +190,23 @@ export default {
   }
 }
 
-@keyframes disappear {
-  95% {
-    opacity: 1;
-  }
-  to {
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
+@media (max-width: 900px) {
+  .planet {
+    position: absolute;
+    top: -45vh;
+    left: 38vw;
+    width: 4rem;
+    height: 4rem;
+    margin: -5px 0 0 -5px;
     opacity: 0;
-    transform: scale(0.3);
+    background: rgba(255, 255, 255, 1);
+    border-radius: 50%;
+    transition: 1s all;
   }
+
+	.blackhole {
+		width: 40px;
+		height: 40px;
+	}
 }
 </style>

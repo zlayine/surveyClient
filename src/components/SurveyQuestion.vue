@@ -1,11 +1,11 @@
 <template>
   <div class="w-full flex flex-col">
     <div
-      class="mx-5 ring ring-indigo-600 ring-opacity-50 rounded-xl bg-white text-center px-32 py-8 pt-14 text-2xl"
+      class="mx-2 sm:mx-5 ring ring-indigo-600 ring-opacity-50 rounded-xl bg-white text-center px-2 sm:px-32 py-4 pt-10 sm:py-8 sm:pt-14 text-xl sm:text-2xl"
     >
       {{ question.name }}
     </div>
-    <div class="flex flex-row justify-center flex-wrap mt-5 mx-5">
+    <div class="flex flex-row justify-center flex-wrap mt-5 sm:mx-5">
       <survey-question-option
         v-for="(item, index) in question.options"
         :key="index"

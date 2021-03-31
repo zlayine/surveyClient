@@ -78,12 +78,11 @@
 <script>
 import CreateQuestions from "../components/CreateQuestions.vue";
 import CreateSettings from "../components/CreateSettings.vue";
-import CreateOrganization from "../components/CreateOrganization.vue";
 
 export default {
   data() {
     return {
-      page: 0,
+      page: 1,
       survey: { name: null, description: null },
       questions: [],
       questionsValid: false,
@@ -170,7 +169,7 @@ export default {
       return this.$store.getters.survey;
     },
   },
-  components: { CreateQuestions, CreateSettings, CreateOrganization },
+  components: { CreateQuestions, CreateSettings },
 };
 </script>
 

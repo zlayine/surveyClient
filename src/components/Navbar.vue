@@ -4,29 +4,22 @@
       <div class="logo">
         <img :src="logo" alt="1337 logo" />
       </div>
-      <!-- <div class="text">
-        <h1>RATE MY</h1>
-        <span>PLATE</span>
-      </div> -->
+      <div class="text">
+        <h1>PEER</h1>
+        <span>SURVEY</span>
+      </div>
     </div>
-    <!-- <div
-      class="nav_items flex flex-row justify-between"
-      v-if="$route.name != 'auth'"
-    >
-      <router-link class="link border-b-4 border-white hover:border-indigo-500" to="/">Surveys</router-link>
-      <router-link class="link border-b-4 border-white hover:border-indigo-500" to="/admin">Admin panel</router-link>
-    </div> -->
     <div class="nav_actions">
-      <router-link class="link border-white my-auto mr-5 ring p-2 rounded-xl text-white bg-indigo-500 shadow-lg hover:shadow-none transition-all" to="/addsurvey">
-        <i-fa class="text-white" icon="plus" />
-        Create Survey
-      </router-link>
       <div class="action flex flex-row" v-if="user">
-        <div class="w-16 rounded-full shadow-md overflow-hidden">
-          <img class="w-full" :src="user.image_url" alt="avatar-img" />
+        <div class="w-14 sm:w-16 rounded-full shadow-md overflow-hidden">
+          <img
+            class="w-full object-fill"
+            :src="user.image_url"
+            alt="avatar-img"
+          />
         </div>
         <div
-          class="ml-5 text-4xl my-auto cursor-pointer text-gray-800 hover:text-gray-600 transition-all"
+          class="ml-2 text-2xl sm:text-4xl my-auto cursor-pointer text-gray-800 hover:text-gray-600 transition-all"
           @click="logout"
         >
           <i-fa icon="sign-out-alt" />
@@ -61,8 +54,7 @@ export default {
       this.$router.push("/auth");
     },
     goToHome() {
-      this.$router.push("/");
-      // this.$router.go();
+      this.$router.push({ name: "home", query: { filter: "new", page: 1 } });
     },
   },
 };
@@ -123,7 +115,7 @@ export default {
 
   .nav_actions {
     display: flex;
-    padding: 0 10px;
+    // padding: 0 10px;
 
     .action {
       display: flex;

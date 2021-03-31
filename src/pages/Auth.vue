@@ -2,7 +2,7 @@
   <div
     class="container mx-auto pt-5 px-10 mb-32 flex flex-col justify-center items-center"
   >
-    <div class="w-1/3 mx-auto">
+    <div class="w-full sm:w-1/4 mx-auto">
       <img class="w-full" :src="login_img" alt="login_img" />
     </div>
     <div class="mt-7" v-if="!$route.query.code">
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import login_img from "@/assets/login_img.svg";
+import login_img from "@/assets/login.svg";
 
 export default {
   data() {

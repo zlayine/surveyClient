@@ -17,6 +17,9 @@ const createQuestionOption = async (questionId, options) => {
 				method: 'post',
 				data: formdata
 			});
+			if (res.data.errors && check_errors(commit, res.data, res.data.errors[0].message)) {
+				return 0;
+			}
 		}
 		return 1;
 	} catch (error) {
@@ -32,8 +35,19 @@ const updateQuestions = async (oldQ, newQ) => {
 		}
 	});
 	for (let i = 0; i < questions.length; i++) {
-		await createQuestionOption(questions[i]._id, questions[i].options);
+		let res = await createQuestionOption(questions[i]._id, questions[i].options);
+		if (!res)
+			return 0;
 	}
+	return 1;
+}
+
+const check_errors = (commit, res, message) => {
+	if (res.errors) {
+		commit("SET_NOTIFICATION", { msg: message, error: 1 });
+		return 1;
+	}
+	return 0;
 }
 
 const user = getLocalUser();
@@ -50,10 +64,18 @@ const store = createStore({
 		socket: null,
 		surveys: [],
 		totalSurveys: 0,
-		users: [],
 		survey: null,
 		surveyStats: null,
 		statsQuestions: [],
+		organizations: [],
+		admin: {
+			users: [],
+			totalUsers: 0,
+			organizations: [],
+			totalOrgs: 0,
+			surveys: [],
+			totalSurveys: 0,
+		}
 	},
 	getters: {
 		user: state => state.user,
@@ -69,7 +91,14 @@ const store = createStore({
 		survey: state => state.survey,
 		surveyStats: state => state.surveyStats,
 		statsQuestions: state => state.statsQuestions,
-		totalSurveys: state => state.totalSurveys
+		totalSurveys: state => state.totalSurveys,
+		adminSurveys: state => state.admin.surveys,
+		adminTotalSurveys: state => state.admin.totalSurveys,
+		adminUsers: state => state.admin.users,
+		adminTotalUsers: state => state.admin.totalUsers,
+		adminOrgs: state => state.admin.organizations,
+		adminTotalOrgs: state => state.admin.totalOrgs,
+		organizations: state => state.organizations,
 	},
 	mutations: {
 		//LOGIN
@@ -120,9 +149,14 @@ const store = createStore({
 			state.user = payload;
 		},
 		UPDATE_USER_ORG(state, payload) {
-			state.user.organization = payload;
+			state.organizations = payload;
 		},
-
+		ADD_USER_ORG(state, payload) {
+			state.organizations.push(payload);
+		},
+		REMOVE_USER_ORG(state, payload) {
+			state.organizations = state.organizations.filter(o => o._id != payload)
+		},
 
 		//SURVEY
 		SET_SURVEYS(state, payload) {
@@ -165,9 +199,47 @@ const store = createStore({
 			})
 			state.surveyStats = payload;
 			state.statsQuestions = payload.questions;
-		}
+		},
+
 	},
 	actions: {
+		async createUser({ commit }, code) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: process.env.VUE_APP_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						mutation { 
+							createUser (code: "${code}") {
+								user{
+									_id
+										username
+										role
+										image_url
+										campus
+								}
+								token
+							}
+						}
+						`
+					}
+				});
+				if (res.data.errors)
+					commit("SET_NOTIFICATION", { msg: res.data.errors[0].message, error: 1 });
+				else {
+					commit("LOGIN", res.data.data.createUser)
+					commit("SET_NOTIFICATION", { msg: "Logged in successfully!", error: 0 });
+				}
+				commit("UPDATE_LOADING")
+				return "1";
+			} catch (error) {
+				console.log(error)
+				commit("UPDATE_LOADING")
+				commit("SET_NOTIFICATION", { msg: error, error: 1 });
+			}
+		},
 		async login({ commit }, data) {
 			try {
 				commit("UPDATE_LOADING")
@@ -191,12 +263,16 @@ const store = createStore({
 						`
 					}
 				});
-				if (res.data.errors)
-					commit("SET_NOTIFICATION", { msg: res.data.errors[0].message, error: 1 });
-				else {
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
 					commit("LOGIN", res.data.data.login)
 					commit("SET_NOTIFICATION", { msg: "Logged in successfully!", error: 0 });
 				}
+				// if (res.data.errors)
+				// 	commit("SET_NOTIFICATION", { msg: res.data.errors[0].message, error: 1 });
+				// else {
+				// 	commit("LOGIN", res.data.data.login)
+				// 	commit("SET_NOTIFICATION", { msg: "Logged in successfully!", error: 0 });
+				// }
 				commit("UPDATE_LOADING")
 				return "1";
 			} catch (error) {
@@ -220,17 +296,14 @@ const store = createStore({
 										role
 										image_url
 										campus
-										organization {
-											_id
-											name
-											logo_url
-										}
 									}
 								}
 							`
 					}
 				});
-				commit("SET_USER", res.data.data.getUser);
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("SET_USER", res.data.data.getUser);
+				}
 				commit("UPDATE_LOADING")
 				return "1";
 			} catch (error) {
@@ -254,6 +327,7 @@ const store = createStore({
 									_id
 									name
 									description
+									answers
 									organization {
 										logo_url
 										name
@@ -271,7 +345,9 @@ const store = createStore({
 						`
 					}
 				});
-				commit('SET_SURVEYS', res.data.data.getSurveys);
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit('SET_SURVEYS', res.data.data.getSurveys);
+				}
 				commit("UPDATE_LOADING");
 				return "success";
 			} catch (error) {
@@ -311,7 +387,9 @@ const store = createStore({
 						`
 					}
 				});
-				commit('UPDATE_SURVEY', res.data.data.getSurvey);
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit('UPDATE_SURVEY', res.data.data.getSurvey);
+				}
 				commit("UPDATE_LOADING");
 				return "success";
 			} catch (error) {
@@ -359,9 +437,17 @@ const store = createStore({
 						}
 					}
 				});
-				if (imageQuestions.length)
-					await updateQuestions(imageQuestions, res.data.data.createSurvey.questions);
-				commit('UPDATE_SURVEYS', res.data.data.createSurvey);
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					if (imageQuestions.length) {
+						let q = await updateQuestions(imageQuestions, res.data.data.createSurvey.questions);
+						if (!q) {
+							// commit("SET_NOTIFICATION", { msg: "Failed to create survey", error: 1 });
+							return null;
+						}
+					}
+					commit('UPDATE_SURVEYS', res.data.data.createSurvey);
+					commit("SET_NOTIFICATION", { msg: "Survey created successfully!", error: 0 });
+				}
 				commit("UPDATE_LOADING");
 				return "success";
 			} catch (error) {
@@ -372,6 +458,7 @@ const store = createStore({
 		},
 		async deleteSurvey({ commit }, data) {
 			try {
+				commit("UPDATE_LOADING")
 				const res = await axios({
 					url: import.meta.env.VITE_GRAPHQL_API,
 					method: 'post',
@@ -383,8 +470,12 @@ const store = createStore({
 					`
 					}
 				});
-				commit("DELETE_SURVEY", data);
-				return res
+				if (!res.data.errors || !check_errors(commit, res.data, "Remove survey failed")) {
+					commit("DELETE_SURVEY", data);
+					commit("SET_NOTIFICATION", { msg: "Survey removed successfully!", error: 0 });
+				}
+				commit("UPDATE_LOADING")
+				return "success";
 			} catch (error) {
 				console.log(error)
 				commit("SET_NOTIFICATION", { msg: "Failed to delete survey: " + error, error: 1 });
@@ -393,6 +484,7 @@ const store = createStore({
 		},
 		async submitAnswers({ commit }, data) {
 			try {
+				commit("UPDATE_LOADING")
 				const res = await axios({
 					url: import.meta.env.VITE_GRAPHQL_API,
 					method: 'post',
@@ -407,6 +499,8 @@ const store = createStore({
 						}
 					},
 				});
+				commit("UPDATE_LOADING")
+				return "success";
 			} catch (error) {
 				console.log(error)
 				commit("SET_NOTIFICATION", { msg: "Failed to delete survey: " + error, error: 1 });
@@ -427,28 +521,38 @@ const store = createStore({
 					method: 'post',
 					data: formdata
 				});
-				commit('UPDATE_USER_ORG', res.data.data.createOrganization);
+				if (!res.data.errors || !check_errors(commit, res.data, "Remove survey failed")) {
+					commit("SET_NOTIFICATION", { msg: "Organization created successfully!", error: 0 });
+					commit('ADD_USER_ORG', res.data.data.createOrganization)
+				}
 				commit("UPDATE_LOADING")
+				return "success";
 			} catch (error) {
 				console.log(error)
 				commit("SET_NOTIFICATION", { msg: "Failed to create organization: " + error, error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		},
-		async deleteOrganization({ commit }) {
+		async deleteOrganization({ commit }, data) {
 			try {
+				commit("UPDATE_LOADING")
 				const res = await axios({
 					url: import.meta.env.VITE_GRAPHQL_API,
 					method: 'post',
 					data: {
 						query: `
 							mutation { 
-								deleteOrganization
+								deleteOrganization(id: "${data}")
 							}
 					`
 					}
 				});
-				commit("UPDATE_USER_ORG", null);
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("SET_NOTIFICATION", { msg: "Organization removed successfully!", error: 0 });
+					commit('REMOVE_USER_ORG', data);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
 			} catch (error) {
 				console.log(error)
 				commit("SET_NOTIFICATION", { msg: "Failed to remove organization: " + error, error: 1 });
@@ -548,6 +652,7 @@ const store = createStore({
 						`
 					}
 				});
+
 				commit('UPDATE_SURVEY_STATS', res.data.data.getSurveyAnswers);
 				commit("UPDATE_LOADING");
 				return "success";
@@ -559,6 +664,7 @@ const store = createStore({
 		},
 		async updateQuestions({ commit }, data) {
 			try {
+				commit("UPDATE_LOADING")
 				// console.log(data);
 				const res = await axios({
 					url: import.meta.env.VITE_GRAPHQL_API,
@@ -574,6 +680,11 @@ const store = createStore({
 						}
 					},
 				});
+				commit("UPDATE_LOADING")
+				if (!res.data.errors || !check_errors(commit, res.data, "Update questions failed")) {
+					commit("SET_NOTIFICATION", { msg: "Questions updated successfully!", error: 1 });
+				}
+				return "success";
 			} catch (error) {
 				console.log(error)
 				commit("SET_NOTIFICATION", { msg: "Failed to update questions: " + error, error: 1 });
@@ -582,6 +693,7 @@ const store = createStore({
 		},
 		async updateSurvey({ commit }, data) {
 			try {
+				commit("UPDATE_LOADING")
 				const res = await axios({
 					url: import.meta.env.VITE_GRAPHQL_API,
 					method: 'post',
@@ -596,6 +708,39 @@ const store = createStore({
 						}
 					},
 				});
+				if (!res.data.errors || !check_errors(commit, res.data, "Update survey failed")) {
+					commit("SET_NOTIFICATION", { msg: "Survey updated successfully!", error: 1 });
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to update survey: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async getUserOrganizations({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						query { 
+							getUserOrganizations(id: "${data}") {
+								_id
+								name
+								logo_url		
+							}
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, "Organizations fetch failed")) {
+					commit("UPDATE_USER_ORG", res.data.data.getUserOrganizations);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
 			} catch (error) {
 				console.log(error)
 				commit("SET_NOTIFICATION", { msg: "Failed to update survey: " + error, error: 1 });
@@ -604,5 +749,7 @@ const store = createStore({
 		},
 	}
 })
+
+
 
 export default store;

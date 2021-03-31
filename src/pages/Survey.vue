@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto py-5 px-10 mb-32">
+  <div class="container mx-auto py-5 px-3 sm:px-10 mb-32">
     <div
       class="survey flex flex-col justify-center items-center mb-20"
       v-if="survey"
