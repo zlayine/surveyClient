@@ -226,7 +226,7 @@ export default {
       this.question++;
     },
     updatedQuestions() {
-      if (!this.changed) this.$emit("updated", "updated1");
+      if (!this.changed) this.$emit("updated", "updated");
       this.changed = true;
     },
     saveQuestions() {

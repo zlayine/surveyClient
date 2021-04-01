@@ -27,7 +27,14 @@ export default {
   data() {
     return {
       selected: [],
+      type: this.type,
     };
+  },
+  watch: {
+    question() {
+			console.log("new question")
+      this.selected = [];
+    },
   },
   methods: {
     selectOption(item) {

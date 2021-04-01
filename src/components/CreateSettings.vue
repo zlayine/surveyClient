@@ -192,21 +192,15 @@ export default {
       confirm: false,
       logo1337: logo,
       settings_img: settingsImage,
-      defaultOrg: "1337",
+      defaultOrg: { name: "1337" },
       url_host: import.meta.env.VITE_API_HOST,
-      changed: false,
       survey: {
         name: null,
         description: null,
-        organization: !this.edit ? "1337" : null,
+        organization: !this.edit ? { name: "1337" } : null,
         campus: "All",
       },
     };
-  },
-  watch: {
-    survey: {
-      handler: "updatedSettings",
-    },
   },
   methods: {
     selectOrg(org) {
@@ -221,13 +215,8 @@ export default {
       await this.$store.dispatch("deleteSurvey", this.survey._id);
       this.$router.push({ name: "home", query: { filter: "new", page: 1 } });
     },
-    updatedSettings() {
-      if (!this.changed) this.$emit("updated", "updated2");
-      this.changed = true;
-    },
     saveSurvey() {
       this.$emit("save", this.survey);
-      this.changed = false;
     },
   },
   computed: {

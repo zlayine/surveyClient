@@ -88,7 +88,7 @@ export default {
     selected() {
       if (this.disabled) return false;
       if (this.type != "multiple") return this.item == this.select[0];
-      else return this.select.filter((s) => s == item).length;
+      else return this.select.filter((s) => s == this.item).length;
     },
   },
 };

@@ -20,7 +20,7 @@
         </div>
         <span
           class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1"
-          v-if="!questionsValid"
+          v-if="!questionsValid && !edit"
         >
           <span
             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
@@ -45,7 +45,7 @@
         </div>
         <span
           class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1"
-          v-if="!infoValid"
+          v-if="!infoValid && !edit"
         >
           <span
             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
@@ -125,8 +125,7 @@ export default {
       this.checker("info");
     },
     checker(type) {
-      if (type == "updated1") this.questionsValid = false;
-      if (type == "updated2") this.infoValid = false;
+      if (type == "updated") this.questionsValid = false;
       if (type == "save") {
         let valid = true;
         let BreakException = {};
@@ -134,17 +133,27 @@ export default {
           this.questions.forEach((q) => {
             if (!q.name || !q.options.length) valid = false;
             q.options.forEach((o) => {
-              if (!o.name || (q.type == "image" && !o.file)) valid = false;
+              if (
+                (!o.name && q.type != "image") ||
+                (q.type == "image" && !o.file)
+              )
+                valid = false;
             });
             if (!valid) throw BreakException;
           });
         } catch (err) {}
         if (valid) this.questionsValid = true;
-        else this.showNotif("Survey questions are not complete to save..", 1);
+        else {
+          this.showNotif("Survey questions are not complete to save..", 1);
+          this.questionsValid = false;
+        }
       } else if (type == "info") {
         if (this.survey.name && this.survey.description && this.survey.campus)
           this.infoValid = true;
-        else this.showNotif("Survey settings are not complete to save..", 1);
+        else {
+          this.showNotif("Survey settings are not complete to save..", 1);
+          this.infoValid = false;
+        }
       }
     },
     async updateSurveyQuestions(questions) {

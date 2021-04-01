@@ -169,6 +169,17 @@ const store = createStore({
 		UPDATE_SURVEY(state, payload) {
 			state.survey = payload;
 		},
+		UPDATE_SURVEY_INFO(state, payload) {
+			state.survey.name = payload.name;
+			state.survey.description = payload.description;
+			state.survey.campus = payload.campus;
+			state.surveys = state.surveys.map(s => {
+				if (s._id == payload._id) {
+					s = state.survey;
+				}
+				return s;
+			})
+		},
 		DELETE_SURVEY(state, payload) {
 			state.surveys = state.surveys.filter(s => s._id != payload);
 		},
@@ -337,6 +348,7 @@ const store = createStore({
 										username
 										image_url
 									}
+									campus
 									totalQuestions
 									createdAt
 								}
@@ -366,7 +378,8 @@ const store = createStore({
 						query: `
 						query { 
 							getSurvey(id: "${data}") {
-								_id					
+								_id
+								campus		
 								questions {
 									_id
 									name
@@ -379,6 +392,11 @@ const store = createStore({
 										_id
 										name
 									}
+								}
+								user {
+									_id
+									username
+									image_url
 								}
 								totalQuestions
 								createdAt
@@ -413,11 +431,13 @@ const store = createStore({
 								_id
 								name
 								description
+								campus
 								organization {
 									logo_url
 									name
 								}
 								user {
+									_id
 									username
 									image_url
 								}
@@ -572,6 +592,7 @@ const store = createStore({
 								_id	
 								name
 								description
+								answers
 								campus
 								organization {
 									_id
@@ -581,6 +602,7 @@ const store = createStore({
 								questions {
 									_id
 									name
+									step
 									question_type {
 										_id
 										type
@@ -589,6 +611,11 @@ const store = createStore({
 										_id
 										name
 									}
+								}
+								user {
+									_id
+									username
+									image_url
 								}
 								totalQuestions
 								createdAt
@@ -709,7 +736,8 @@ const store = createStore({
 					},
 				});
 				if (!res.data.errors || !check_errors(commit, res.data, "Update survey failed")) {
-					commit("SET_NOTIFICATION", { msg: "Survey updated successfully!", error: 1 });
+					commit("SET_NOTIFICATION", { msg: "Survey updated successfully!", error: 0 });
+					commit("UPDATE_SURVEY_INFO", data);
 				}
 				commit("UPDATE_LOADING")
 				return "success";
