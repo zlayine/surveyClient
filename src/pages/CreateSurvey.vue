@@ -68,6 +68,7 @@
         v-show="page == 1"
         @save="updateInfo"
         @publish="publish"
+        @updated="checker"
         @update="updateSurveyInfo"
         :edit="edit"
       />
@@ -82,7 +83,7 @@ import CreateSettings from "../components/CreateSettings.vue";
 export default {
   data() {
     return {
-      page: 1,
+      page: 0,
       survey: { name: null, description: null },
       questions: [],
       questionsValid: false,
@@ -95,17 +96,22 @@ export default {
       this.edit = true;
       if (!this.surveyEdit || this.$route.params.id != this.surveyEdit._id)
         this.getSurvey();
+    } else {
+      this.$store.commit("CLEAR_SURVEY");
     }
   },
-  watch: {
-    "$route.path": function (val, oldVal) {
-      if (this.$route.name != "editsurvey") {
-        this.edit = false;
-        this.$store.commit("CLEAR_SURVEY");
-      }
-    },
-  },
+  // watch: {
+  //   "$route.path": function (val, oldVal) {
+  //     if (this.$route.name != "editsurvey") {
+  //       this.edit = false;
+  //       this.$store.commit("CLEAR_SURVEY");
+  //     }
+  //   },
+  // },
   methods: {
+    showNotif(message, error = 0) {
+      this.$store.commit("SET_NOTIFICATION", { msg: message, error: error });
+    },
     async getSurvey() {
       await this.$store.dispatch("getSurveyEdit", this.$route.params.id);
       if (!this.surveyEdit) this.$router.push("/");
@@ -119,21 +125,36 @@ export default {
       this.checker("info");
     },
     checker(type) {
-      if (type == "updated") this.questionsValid = false;
+      if (type == "updated1") this.questionsValid = false;
+      if (type == "updated2") this.infoValid = false;
       if (type == "save") {
-        this.questionsValid = true;
+        let valid = true;
+        let BreakException = {};
+        try {
+          this.questions.forEach((q) => {
+            if (!q.name || !q.options.length) valid = false;
+            q.options.forEach((o) => {
+              if (!o.name || (q.type == "image" && !o.file)) valid = false;
+            });
+            if (!valid) throw BreakException;
+          });
+        } catch (err) {}
+        if (valid) this.questionsValid = true;
+        else this.showNotif("Survey questions are not complete to save..", 1);
       } else if (type == "info") {
-        this.infoValid = true;
+        if (this.survey.name && this.survey.description && this.survey.campus)
+          this.infoValid = true;
+        else this.showNotif("Survey settings are not complete to save..", 1);
       }
     },
     async updateSurveyQuestions(questions) {
       this.questions = questions;
       this.checker("save");
-      // if (this.questionsValid)
-      await this.$store.dispatch("updateQuestions", {
-        id: this.surveyEdit._id,
-        questions: this.questions,
-      });
+      if (this.questionsValid)
+        await this.$store.dispatch("updateQuestions", {
+          id: this.surveyEdit._id,
+          questions: this.questions,
+        });
     },
     async updateSurveyInfo(survey) {
       this.survey = survey;
@@ -142,25 +163,19 @@ export default {
         await this.$store.dispatch("updateSurvey", this.survey);
     },
     async publish() {
-      this.questions = this.questions.map((q, index) => {
-        q.step = index;
-        return q;
-      });
-      this.survey.questions = this.questions;
-      let obj = Object.assign({}, this.survey);
       if (!this.infoValid)
-        this.$store.commit("SET_NOTIFICATION", {
-          msg: "Please save your survey settings..",
-          error: 1,
+        this.showNotif("Please save your survey settings..", 1);
+      else if (!this.questionsValid)
+        this.showNotif("Please save your survey questions..", 1);
+      else if (this.infoValid && this.questionsValid) {
+        this.questions = this.questions.map((q, index) => {
+          q.step = index;
+          return q;
         });
-      if (!this.questionsValid)
-        this.$store.commit("SET_NOTIFICATION", {
-          msg: "Please save your survey questions..",
-          error: 1,
-        });
-      if (this.infoValid && this.questionsValid) {
+        this.survey.questions = this.questions;
+        let obj = Object.assign({}, this.survey);
         let res = await this.$store.dispatch("createSurvey", obj);
-        this.$router.push("/");
+        if (res) this.$router.push("/");
       }
     },
   },

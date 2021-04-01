@@ -78,7 +78,7 @@
                   </div>
                   <div
                     class="absolute top-3 right-3 z-20 bg-red-200 p-2 rounded-full flex justify-center items-center cursor-pointer hover:bg-transparent transition-all"
-										@click="deleteOrganization(org)"
+                    @click="deleteOrganization(org)"
                   >
                     <i-fa class="text-xl text-red-500 shadow-md" icon="trash" />
                   </div>
@@ -194,23 +194,30 @@ export default {
     },
     async orgDialogAction() {
       if (this.selected == 1) {
-        let res = await this.$store.dispatch("createOrganization", {
-          name: this.name,
-          logo: this.file,
-        });
-        if (res) this.selected = 0;
+        if (this.name && this.file) {
+          let res = await this.$store.dispatch("createOrganization", {
+            name: this.name,
+            logo: this.file,
+          });
+          if (res) this.selected = 0;
+        } else {
+          this.$store.commit("SET_NOTIFICATION", {
+            msg: "Please complete your organization info..",
+            error: 1,
+          });
+        }
       } else {
         if (this.organization) this.$emit("select", this.organization);
         else
           this.$store.commit("SET_NOTIFICATION", {
-            msg: "Please select an organization",
+            msg: "Please select an organization..",
             error: 1,
           });
       }
     },
     async deleteOrganization(org) {
-			let res = await this.$store.dispatch("deleteOrganization", org._id);
-		},
+      let res = await this.$store.dispatch("deleteOrganization", org._id);
+    },
   },
   computed: {
     user() {

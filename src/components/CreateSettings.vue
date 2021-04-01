@@ -119,7 +119,7 @@
         </label>
         <div class="w-full flex justify-between">
           <button
-            @click="$emit('save', survey)"
+            @click="saveSurvey"
             v-if="!edit"
             class="bg-green-400 rounded-xl mt-auto px-6 py-2 text-white shadow-md focus:outline-none hover:shadow-none transition-all"
           >
@@ -185,7 +185,7 @@ import settingsImage from "@/assets/settings.svg";
 
 export default {
   props: ["edit"],
-  emits: ["save", "publish", "update"],
+  emits: ["save", "publish", "update", "updated"],
   data() {
     return {
       show: false,
@@ -194,6 +194,7 @@ export default {
       settings_img: settingsImage,
       defaultOrg: "1337",
       url_host: import.meta.env.VITE_API_HOST,
+      changed: false,
       survey: {
         name: null,
         description: null,
@@ -201,6 +202,11 @@ export default {
         campus: "All",
       },
     };
+  },
+  watch: {
+    survey: {
+      handler: "updatedSettings",
+    },
   },
   methods: {
     selectOrg(org) {
@@ -214,6 +220,14 @@ export default {
       this.confirm = false;
       await this.$store.dispatch("deleteSurvey", this.survey._id);
       this.$router.push({ name: "home", query: { filter: "new", page: 1 } });
+    },
+    updatedSettings() {
+      if (!this.changed) this.$emit("updated", "updated2");
+      this.changed = true;
+    },
+    saveSurvey() {
+      this.$emit("save", this.survey);
+      this.changed = false;
     },
   },
   computed: {

@@ -24,8 +24,12 @@
             />
             <select
               v-model="question.type"
-              class="rounded-xl cursor-pointer text-lg font-bold text-white h-10 w-auto pl-5 pr-10 bg-green-400 border-none focus:outline-none appearance-none transition-all"
-              :class="{ 'bg-indigo-300': this.question != index, 'pointer-events-none': edit }"
+              @change="emptyOptions(question)"
+              class="rounded-xl cursor-pointer text-lg font-bold text-white h-10 w-auto pl-5 pr-10 bg-green-400 border-none outline-none focus:outline-none appearance-none transition-all"
+              :class="{
+                'bg-indigo-300': this.question != index,
+                'pointer-events-none': edit,
+              }"
             >
               <option value="0">Question type</option>
               <option value="choice">Choice</option>
@@ -112,7 +116,7 @@
               </div>
               <div
                 class="w-full flex rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer"
-                v-else
+                v-else-if="edit"
               >
                 <img
                   class="ml-2 h-12 w-20 object-contain"
@@ -151,7 +155,6 @@
           <button
             v-show="typeChecker(question) && !edit"
             @click="addOption(question)"
-
             class="mt-2 ring ring-green-400 ring-opacity-30 border-green-400 border-opacity-50 focus:outline-none w-full rounded-xl p-2 text-lg text-green-400 transition-all"
           >
             <i-fa icon="plus" class="mr-1" />Add Option
@@ -161,7 +164,7 @@
     </div>
     <div class="flex justify-between">
       <div
-				v-if="!edit"
+        v-if="!edit"
         @click="newQuestion"
         class="bg-green-400 text-xl rounded-full text-white w-12 h-12 shadow-xl mt-3 flex cursor-pointer hover:shadow-none transition-all"
       >
@@ -215,23 +218,30 @@ export default {
   },
   methods: {
     newQuestion() {
-      this.questions.push({ type: "choice", name: "", options: [] });
+      this.questions.push({
+        type: "choice",
+        name: "",
+        options: [{ name: null }],
+      });
       this.question++;
     },
     updatedQuestions() {
-      if (!this.changed) this.$emit("updated", "updated");
+      if (!this.changed) this.$emit("updated", "updated1");
       this.changed = true;
     },
     saveQuestions() {
       this.changed = false;
       this.$emit("save", this.questions);
     },
-		updateQuestions(){
+    updateQuestions() {
       this.changed = false;
       this.$emit("update", this.questions);
-		},
+    },
     selectQuestion(index) {
       this.question = index;
+    },
+    emptyOptions(question) {
+      question.options = [{ name: null }];
     },
     typeChecker(question) {
       if (question.type == "text" && question.options.length > 0) return false;

@@ -4,13 +4,13 @@
     v-if="notification"
   >
     <div
-      class="text-white px-6 w-96 py-4 mt-2 shadow-xl border-0 rounded relative mb-4 bg-red-500"
+      class="text-white px-6 w-96 py-4 mt-2 shadow-xl border-0 rounded relative flex mb-4 bg-red-500"
       :class="{ 'bg-green-500': notification == 1 }"
     >
-      <span class="text-xl inline-block mr-5 align-middle">
+      <span class="text-xl mr-5 align-middle my-auto">
         <i-fa class="text-white" icon="bell" />
       </span>
-      <span class="inline-block align-middle mr-8">
+      <span class="align-middle break-words">
         {{ notification_msg }}
       </span>
     </div>
