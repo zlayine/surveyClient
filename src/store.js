@@ -2,7 +2,7 @@ import axios from 'axios'
 import { createStore } from "vuex"
 import { getLocalUser } from './auth.js';
 
-const createQuestionOption = async (questionId, options) => {
+const createQuestionOption = async (commit, questionId, options) => {
 	try {
 		for (let i = 0; i < options.length; i++) {
 			let item = options[i];
@@ -27,7 +27,7 @@ const createQuestionOption = async (questionId, options) => {
 	}
 }
 
-const updateQuestions = async (oldQ, newQ) => {
+const updateQuestions = async (commit, oldQ, newQ) => {
 	let questions = newQ.filter(q => {
 		if (q.question_type.type == 'image') {
 			q.options = oldQ.filter(o => o.step == q.step)[0].options
@@ -35,11 +35,31 @@ const updateQuestions = async (oldQ, newQ) => {
 		}
 	});
 	for (let i = 0; i < questions.length; i++) {
-		let res = await createQuestionOption(questions[i]._id, questions[i].options);
+		let res = await createQuestionOption(commit, questions[i]._id, questions[i].options);
 		if (!res)
 			return 0;
 	}
 	return 1;
+}
+
+const deleteSurvey = async (id) => {
+	try {
+		const res = await axios({
+			url: import.meta.env.VITE_GRAPHQL_API,
+			method: 'post',
+			data: {
+				query: `
+					mutation { 
+						deleteSurvey (id: "${id}")
+					}
+			`
+			}
+		});
+		return res
+	} catch (error) {
+		console.log(error)
+		return null;
+	}
 }
 
 const check_errors = (commit, res, message) => {
@@ -459,10 +479,10 @@ const store = createStore({
 				});
 				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
 					if (imageQuestions.length) {
-						let q = await updateQuestions(imageQuestions, res.data.data.createSurvey.questions);
+						let q = await updateQuestions(commit, imageQuestions, res.data.data.createSurvey.questions);
 						if (!q) {
-							// commit("SET_NOTIFICATION", { msg: "Failed to create survey", error: 1 });
-							return null;
+							let del = await deleteSurvey(res.data.data.createSurvey._id);
+							throw new Error("Image upload failed..")
 						}
 					}
 					commit('UPDATE_SURVEYS', res.data.data.createSurvey);
@@ -479,17 +499,7 @@ const store = createStore({
 		async deleteSurvey({ commit }, data) {
 			try {
 				commit("UPDATE_LOADING")
-				const res = await axios({
-					url: import.meta.env.VITE_GRAPHQL_API,
-					method: 'post',
-					data: {
-						query: `
-							mutation { 
-								deleteSurvey (id: "${data}")
-							}
-					`
-					}
-				});
+				let res = await deleteSurvey(data);
 				if (!res.data.errors || !check_errors(commit, res.data, "Remove survey failed")) {
 					commit("DELETE_SURVEY", data);
 					commit("SET_NOTIFICATION", { msg: "Survey removed successfully!", error: 0 });
