@@ -7,17 +7,23 @@
     </div>
     <div class="mt-7" v-if="!$route.query.code">
       <button
-        class="rounded-xl bg-green-500 text-white text-xl px-8 py-2"
+        class="rounded-xl bg-green-500 text-white text-xl px-8 py-2 shadow-md hover:shadow-none transition-all"
         :disbled="!!$route.query.code"
         @click="signin"
         :disabled="loading"
       >
         <template v-if="loading">
           <i-fa class="text-white" icon="circle-notch" spin />
-          Signin in
+          Loading..
         </template>
         <template v-else> Sign in with intra </template>
       </button>
+      <div
+        class="rounded-xl mt-2 bg-gray-500 text-white text-lg text-center px-8 py-2 cursor-pointer"
+        @click="demo"
+      >
+        Demo
+      </div>
     </div>
   </div>
 </template>
@@ -42,10 +48,9 @@ export default {
   methods: {
     async signin() {
       this.loading = true;
-      // if (!this.currentUser) window.location.href = process.env.VUE_APP_AUTH_42;
-      // else
-      // login(this.currentUser.user);
-      await this.$store.dispatch("login", "6050823778673083d169e0ee");
+      if (!this.currentUser)
+        window.location.href = import.meta.env.VITE_AUTH_42;
+      else login(this.currentUser.user);
       this.loading = false;
       this.$router.push("/");
     },
@@ -53,6 +58,10 @@ export default {
       this.loading = true;
       await this.$store.dispatch("createUser", this.$route.query.code + "");
       this.loading = false;
+      this.$router.push("/");
+    },
+    async demo() {
+      await this.$store.dispatch("loginDemo");
       this.$router.push("/");
     },
   },

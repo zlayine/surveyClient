@@ -137,12 +137,12 @@ const store = createStore({
 		},
 
 		//SOCKET
-		SET_SOCKET(state, payload) {
-			if (!state.socket) {
-				state.socket = io(process.env.VUE_APP_API_HOST, { query: { token: payload } })
-				state.socket.emit('join', state.user.campus);
-			}
-		},
+		// SET_SOCKET(state, payload) {
+		// 	if (!state.socket) {
+		// 		state.socket = io(process.env.VUE_APP_API_HOST, { query: { token: payload } })
+		// 		state.socket.emit('join', state.user.campus);
+		// 	}
+		// },
 
 		//LOADING
 		UPDATE_LOADING(state) {
@@ -238,7 +238,7 @@ const store = createStore({
 			try {
 				commit("UPDATE_LOADING")
 				const res = await axios({
-					url: process.env.VUE_APP_GRAPHQL_API,
+					url: import.meta.env.VITE_GRAPHQL_API,
 					method: 'post',
 					data: {
 						query: `
@@ -298,12 +298,41 @@ const store = createStore({
 					commit("LOGIN", res.data.data.login)
 					commit("SET_NOTIFICATION", { msg: "Logged in successfully!", error: 0 });
 				}
-				// if (res.data.errors)
-				// 	commit("SET_NOTIFICATION", { msg: res.data.errors[0].message, error: 1 });
-				// else {
-				// 	commit("LOGIN", res.data.data.login)
-				// 	commit("SET_NOTIFICATION", { msg: "Logged in successfully!", error: 0 });
-				// }
+				commit("UPDATE_LOADING")
+				return "1";
+			} catch (error) {
+				console.log(error)
+				commit("UPDATE_LOADING")
+				commit("SET_NOTIFICATION", { msg: error, error: 1 });
+			}
+		},
+		async loginDemo({ commit }) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+							query { 
+								loginDemo {
+									user {
+										_id
+										username
+										role
+										image_url
+										campus
+									}
+									token
+								}
+							}
+						`
+					}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("LOGIN", res.data.data.loginDemo)
+					commit("SET_NOTIFICATION", { msg: "Logged in successfully!", error: 0 });
+				}
 				commit("UPDATE_LOADING")
 				return "1";
 			} catch (error) {
