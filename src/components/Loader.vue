@@ -2,7 +2,7 @@
   <div class="loader" v-if="loading">
     <div class="holder">
       <div class="percent" v-if="uploadPercent != null">
-        {{ uploadPercent }}%
+        {{ uploadPercent }}0%
       </div>
 			<i-fa class="text-indigo-500 " icon="circle-notch" spin />
     </div>
