@@ -4,7 +4,7 @@
       <div class="percent" v-if="uploadPercent != null">
         {{ uploadPercent }}%
       </div>
-			<i-fa class="text-indigo-500" icon="circle-notch" spin />
+			<i-fa class="text-indigo-500 " icon="circle-notch" spin />
     </div>
   </div>
 </template>
