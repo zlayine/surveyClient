@@ -48,6 +48,22 @@
             </h6>
           </div>
         </div>
+        <div class="flex my-auto">
+          <div
+            class="bg-indigo-400 text-white px-3 py-2 rounded-xl shadow-md hover:shadow-none cursor-pointer mr-2"
+            @click="exportSurvey"
+          >
+            <i-fa icon="download" />
+            <span class="hidden ml-1 sm:inline-block">Export</span>
+          </div>
+          <div
+            class="bg-indigo-400 text-white px-3 py-2 rounded-xl shadow-md hover:shadow-none cursor-pointer mr-2"
+            @click="shareSurvey"
+          >
+            <i-fa icon="share-alt" />
+            <span class="hidden ml-1 sm:inline-block">Share</span>
+          </div>
+        </div>
       </div>
       <nav class="flex flex-row w-full">
         <div class="flex-1 flex flex-col items-center justify-center">
@@ -87,6 +103,7 @@ import StatsIndividual from "../components/StatsIndividual.vue";
 import StatsSummary from "../components/StatsSummary.vue";
 import logo from "@/assets/1337.svg";
 import moment from "moment";
+import { toClipboard } from "@soerenmartius/vue3-clipboard";
 
 export default {
   data() {
@@ -104,10 +121,19 @@ export default {
     formatDate(val) {
       return moment(String(val)).format("DD/MM/YYYY");
     },
+    async shareSurvey() {
+      await toClipboard(import.meta.env.VITE_URL + "survey/" + this.$route.params.id + "?share=true");
+      this.$store.commit("SET_NOTIFICATION", {
+        msg: "Sharable link coppied to clipboard",
+        error: 0,
+      });
+    },
+    exportSurvey() {},
   },
-  async created() {
-    if (!this.survey || this.$route.params.id != this.survey._id)
-      await this.getStats();
+  async mounted() {
+    // if (!this.survey || this.$route.params.id != this.survey._id)
+    this.$store.commit("CLEAR_STATS");
+    await this.getStats();
   },
   computed: {
     survey() {

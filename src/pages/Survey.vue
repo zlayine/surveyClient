@@ -10,10 +10,13 @@
         <span class="font-bold">Question</span> {{ current + 1 }} from
         {{ survey.totalQuestions }}
       </div>
-      <survey-question
-        :question="survey.questions[current]"
-        @select="setAnswer"
-      />
+      <transition name="fade">
+        <survey-question
+          :question="question"
+          @select="setAnswer"
+          :answer="selectedAnswer"
+        />
+      </transition>
       <div class="flex justify-center">
         <button
           class="bg-indigo-600 hover:shadow-none transition-all w-auto mr-5 text-white rounded-3xl text-xl px-10 py-2 mt-5 mx-auto shadow-lg focus:outline-none cursor-pointer"
@@ -38,17 +41,30 @@
         </button>
       </div>
     </div>
+    <transition name="fade">
+      <survey-shared-start-dialog
+        v-show="share"
+        @cancel="share = false"
+        :survey="survey"
+      />
+    </transition>
   </div>
 </template>
 
 <script>
-import SurveyQuestion from "../components/SurveyQuestion.vue";
+import SurveyQuestion from "@/components/SurveyQuestion.vue";
+import SurveySharedStartDialog from "@/components/SurveySharedStartDialog.vue";
+
 export default {
   data() {
     return {
       current: 0,
       answers: [],
+      share: false,
     };
+  },
+  mounted() {
+    if (this.$route.query.share) this.share = true;
   },
   methods: {
     setAnswer(selected) {
@@ -66,8 +82,22 @@ export default {
           return a;
         });
     },
+    answered() {
+      if (
+        this.answers[this.current] &&
+        this.answers[this.current].selected.length
+      )
+        return true;
+      return false;
+    },
     next() {
-      if (++this.current == this.survey.questions.length) this.current = 0;
+      if (this.answered()) {
+        if (++this.current == this.survey.questions.length) this.current = 0;
+      } else
+        this.$store.commit("SET_NOTIFICATION", {
+          msg: "Please answer this question..",
+          error: 1,
+        });
     },
     prev() {
       if (--this.current < 0) this.current = 0;
@@ -97,8 +127,19 @@ export default {
       if (this.current == this.survey.questions.length - 1) return true;
       return false;
     },
+    selectedAnswer() {
+      if (
+        this.answers[this.current] &&
+        this.answers[this.current].selected.length
+      )
+        return this.answers[this.current].selected;
+      return [];
+    },
+    question() {
+      return this.survey.questions[this.current];
+    },
   },
-  components: { SurveyQuestion },
+  components: { SurveyQuestion, SurveySharedStartDialog },
 };
 </script>
 

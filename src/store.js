@@ -231,6 +231,10 @@ const store = createStore({
 			state.surveyStats = payload;
 			state.statsQuestions = payload.questions;
 		},
+		CLEAR_STATS(state) {
+			state.surveyStats = null;
+			state.statsQuestions = null;
+		},
 
 	},
 	actions: {
@@ -428,6 +432,8 @@ const store = createStore({
 						query { 
 							getSurvey(id: "${data}") {
 								_id
+								name
+								description
 								campus		
 								questions {
 									_id
@@ -521,7 +527,7 @@ const store = createStore({
 				return "success";
 			} catch (error) {
 				console.log(error)
-				commit("SET_NOTIFICATION", { msg: "Failed to create survey: " + error, error: 1 });
+				commit("SET_NOTIFICATION", { msg: "Failed to create survey", error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		},
@@ -537,7 +543,7 @@ const store = createStore({
 				return "success";
 			} catch (error) {
 				console.log(error)
-				commit("SET_NOTIFICATION", { msg: "Failed to delete survey: " + error, error: 1 });
+				commit("SET_NOTIFICATION", { msg: "Failed to delete survey", error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		},
@@ -562,7 +568,7 @@ const store = createStore({
 				return "success";
 			} catch (error) {
 				console.log(error)
-				commit("SET_NOTIFICATION", { msg: "Failed to delete survey: " + error, error: 1 });
+				commit("SET_NOTIFICATION", { msg: "Failed to delete survey", error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		},
@@ -588,7 +594,7 @@ const store = createStore({
 				return "success";
 			} catch (error) {
 				console.log(error)
-				commit("SET_NOTIFICATION", { msg: "Failed to create organization: " + error, error: 1 });
+				commit("SET_NOTIFICATION", { msg: "Failed to create organization", error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		},
@@ -614,7 +620,7 @@ const store = createStore({
 				return "success";
 			} catch (error) {
 				console.log(error)
-				commit("SET_NOTIFICATION", { msg: "Failed to remove organization: " + error, error: 1 });
+				commit("SET_NOTIFICATION", { msg: "Failed to remove organization", error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		},
@@ -667,7 +673,7 @@ const store = createStore({
 				commit("UPDATE_LOADING");
 			} catch (error) {
 				console.log(error)
-				commit("SET_NOTIFICATION", { msg: "Failed to get survey edit: " + error, error: 1 });
+				commit("SET_NOTIFICATION", { msg: "Failed to get survey edit", error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		},
@@ -724,7 +730,7 @@ const store = createStore({
 				return "success";
 			} catch (error) {
 				console.log(error)
-				commit("SET_NOTIFICATION", { msg: "Failed to get answers: " + error, error: 1 });
+				commit("SET_NOTIFICATION", { msg: "Failed to get answers", error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		},

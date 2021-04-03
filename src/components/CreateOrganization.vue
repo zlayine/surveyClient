@@ -57,6 +57,9 @@
                 </div>
               </nav>
               <div class="mt-5 flex flex-wrap" v-if="selected == 0">
+                <div class="text-center w-full py-5" v-if="!organizations.length">
+                  You have no organizations created...
+                </div>
                 <div
                   class="px-2 py-1 w-full sm:w-1/2 relative"
                   v-for="(org, index) in organizations"
@@ -85,7 +88,7 @@
                 </div>
               </div>
               <div class="mt-5" v-if="selected == 1">
-                <label class="block w-2/3 mb-3">
+                <label class="block w-full sm:w-2/3 mb-3 mx-auto">
                   <span class="text-gray-700">Name</span>
                   <input
                     type="text"
@@ -95,7 +98,7 @@
                   />
                 </label>
                 <div
-                  class="w-full sm:w-2/3 flex rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer"
+                  class="w-full sm:w-2/3 mx-auto flex rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer"
                   @click="launchFilePicker()"
                 >
                   <div class="p-2 ml-3 h-12 flex" v-if="!url">

@@ -37,7 +37,7 @@
               v-if="survey.organization != defaultOrg"
               class="flex justify-center items-center text-sm ring text-black w-1/2 h-full rounded-xl mt-1 ml-2 cursor-pointer shadow-md bg-white border border-gray-100 hover:shadow-none transition-all ring-indigo-300 max-h-11 relative z-10"
             >
-              <div class="w-10 bg-white m-1">
+              <div class="w-10 bg-white m-1" v-if="survey.organization.logo_url">
                 <img
                   class="my-auto h-9"
                   :src="url_host + survey.organization.logo_url"

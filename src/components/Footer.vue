@@ -4,7 +4,7 @@
     <i-fa
       @click="$emit('start')"
       icon="heart"
-      class="text-pink-500 text-2xl cursor-pointer"
+      class="text-red-500 text-2xl cursor-pointer"
     />
     for 1337
   </footer>

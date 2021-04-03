@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex justify-center z-50 items-center absolute left-0 right-0 w-full"
+    class="flex justify-center z-50 items-center fixed left-0 right-0 w-full"
     v-if="notification"
   >
     <div

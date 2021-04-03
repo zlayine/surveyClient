@@ -1,5 +1,5 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCircleNotch, faSignOutAlt, faCheck, faCheckCircle, faHeart, faCopy, faTrash, faArrowUp, faArrowDown, faChevronUp, faChevronDown, faCogs, faEye, faList, faPlus, faEllipsisV, faChevronLeft, faChevronRight, faBell, faBrain, faEdit } from '@fortawesome/free-solid-svg-icons'
+import { faCircleNotch, faSignOutAlt, faCheck, faCheckCircle, faHeart, faCopy, faTrash, faArrowUp, faArrowDown, faChevronUp, faChevronDown, faCogs, faEye, faList, faPlus, faEllipsisV, faChevronLeft, faChevronRight, faBell, faBrain, faEdit, faDownload, faShareAlt, faUserShield } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faCircleNotch)
 library.add(faSignOutAlt)
@@ -19,3 +19,6 @@ library.add(faChevronRight)
 library.add(faBell)
 library.add(faBrain)
 library.add(faEdit)
+library.add(faDownload)
+library.add(faShareAlt)
+library.add(faUserShield)

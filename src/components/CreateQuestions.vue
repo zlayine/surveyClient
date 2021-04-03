@@ -1,167 +1,171 @@
 <template>
   <div class="create flex flex-col">
-    <div
-      v-for="(question, index) in questions"
-      :key="index"
-      class="w-full bg-white ring-1 mb-5 ring-gray-300 ring-opacity-50 shadow-lg rounded-xl p-3"
-      @click="selectQuestion(index)"
-    >
+    <transition-group name="expand" appear>
       <div
-        class="header flex flex-row justify-between mb-3"
-        :class="{ 'pointer-events-none': this.question != index }"
+        v-for="(question, index) in questions"
+        :key="index"
+        class="w-full bg-white ring-1 mb-5 ring-gray-300 ring-opacity-50 shadow-lg rounded-xl p-3"
+        @click="selectQuestion(index)"
       >
-        <div class="info flex flex-row">
-          <div
-            class="number h-10 w-10 rounded-xl mr-1 flex justify-center bg-green-400 text-white text-lg font-bold transition-all"
-            :class="{ 'bg-indigo-300': this.question != index }"
-          >
-            <div class="m-auto">{{ index + 1 }}</div>
-          </div>
-          <div class="relative inline-flex">
-            <i-fa
-              icon="chevron-down"
-              class="w-4 h-4 absolute top-0 right-0 m-3 pointer-events-none text-white text-xl"
-            />
-            <select
-              v-model="question.type"
-              @change="emptyOptions(question)"
-              class="rounded-xl cursor-pointer text-lg font-bold text-white h-10 w-auto pl-5 pr-10 bg-green-400 border-none outline-none focus:outline-none appearance-none transition-all"
-              :class="{
-                'bg-indigo-300': this.question != index,
-                'pointer-events-none': edit,
-              }"
-            >
-              <option value="0">Question type</option>
-              <option value="choice">Choice</option>
-              <option value="multiple">Multiple</option>
-              <option value="rate">Rate</option>
-              <option value="text">Text</option>
-              <option value="image">Image</option>
-            </select>
-          </div>
-        </div>
-        <div class="flex" v-if="!edit">
-          <div
-            class="mr-1 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-indigo-300 transition-all cursor-pointer"
-            @click="duplicateQuestion"
-          >
-            <i-fa icon="copy" class="m-auto" />
-          </div>
-          <div
-            @click="removeQuestion(index)"
-            class="mr-0 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-red-500 transition-all cursor-pointer"
-          >
-            <i-fa icon="trash" class="m-auto" />
-          </div>
-        </div>
-      </div>
-      <div
-        class="question"
-        :class="{ 'pointer-events-none': this.question != index }"
-      >
-        <span class="text-sm font-bold text-gray-300">Question</span>
-        <textarea
-          v-model="question.name"
-          class="block w-full rounded-lg text-xl resize-none bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          rows="3"
-        ></textarea>
-      </div>
-      <transition name="expand" appear mode="out-in">
         <div
-          class="options mt-3 relative"
+          class="header flex flex-row justify-between mb-3"
           :class="{ 'pointer-events-none': this.question != index }"
-          v-show="this.question == index && question.type != 0"
         >
-          <span
-            class="text-sm font-bold text-gray-300"
-            v-if="question.options.length"
-            >Options</span
-          >
-          <div
-            class="mb-2 mt-2 flex flex-row"
-            v-for="(option, index) in question.options"
-            :key="index"
-          >
-            <input
-              class="flex-1 py-3 block w-full rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              type="text"
-              v-if="question.type != 'image'"
-              v-model="option.name"
-              placeholder="name"
-            />
-            <div class="flex-1 flex" v-else>
-              <div
-                v-if="!option.name"
-                class="w-full flex rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer"
-                @click="launchFilePicker(index)"
-              >
-                <div class="p-2 ml-3 h-12 flex" v-if="!option.url">
-                  <i-fa icon="plus" class="my-auto mr-2" />
-                  <span class="my-auto"> Add Image </span>
-                </div>
-                <img
-                  v-if="option.url"
-                  class="ml-2 h-12 w-20 object-contain"
-                  :src="option.url"
-                  alt="image option"
-                />
-
-                <div
-                  class="flex flex-1 p-2 justify-between m-auto"
-                  v-if="option.url"
-                >
-                  <div>{{ option.file.name }}</div>
-                  <div class="">{{ sizeFilter(option.size) }}</div>
-                </div>
-              </div>
-              <div
-                class="w-full flex rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer"
-                v-else-if="edit"
-              >
-                <img
-                  class="ml-2 h-12 w-20 object-contain"
-                  :src="url_host + option.name"
-                  alt="image option"
-                />
-              </div>
-              <input
-                type="file"
-                ref="file"
-                @change="onFileChange($event.target.files)"
-                style="display: none"
-              />
+          <div class="info flex flex-row">
+            <div
+              class="number h-10 w-10 rounded-xl mr-1 flex justify-center bg-green-400 text-white text-lg font-bold transition-all"
+              :class="{ 'bg-indigo-300': this.question != index }"
+            >
+              <div class="m-auto">{{ index + 1 }}</div>
             </div>
-            <div class="ml-2 flex flex-row my-auto" v-if="!edit">
-              <div
-                class="mr-1 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-indigo-300 transition-all cursor-pointer"
-                @click="moveOption(index, 'up')"
+            <div class="relative inline-flex">
+              <i-fa
+                icon="chevron-down"
+                class="w-4 h-4 absolute top-0 right-0 m-3 pointer-events-none text-white text-xl"
+              />
+              <select
+                v-model="question.type"
+                @change="emptyOptions(question)"
+                class="rounded-xl cursor-pointer text-lg font-bold text-white h-10 w-auto pl-5 pr-10 bg-green-400 border-none outline-none focus:outline-none appearance-none transition-all"
+                :class="{
+                  'bg-indigo-300': this.question != index,
+                  'pointer-events-none': edit,
+                }"
               >
-                <i-fa icon="chevron-up" class="m-auto" />
-              </div>
-              <div
-                class="mr-1 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-indigo-300 transition-all cursor-pointer"
-                @click="moveOption(index)"
-              >
-                <i-fa icon="chevron-down" class="m-auto" />
-              </div>
-              <div
-                @click="removeOption(index)"
-                class="mr-0 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-red-500 transition-all cursor-pointer"
-              >
-                <i-fa icon="trash" class="m-auto" />
-              </div>
+                <option value="0">Question type</option>
+                <option value="choice">Choice</option>
+                <option value="multiple">Multiple</option>
+                <option value="rate">Rate</option>
+                <option value="text">Text</option>
+                <option value="image">Image</option>
+              </select>
             </div>
           </div>
-          <button
-            v-show="typeChecker(question) && !edit"
-            @click="addOption(question)"
-            class="mt-2 ring ring-green-400 ring-opacity-30 border-green-400 border-opacity-50 focus:outline-none w-full rounded-xl p-2 text-lg text-green-400 transition-all"
-          >
-            <i-fa icon="plus" class="mr-1" />Add Option
-          </button>
+          <div class="flex" v-if="!edit">
+            <div
+              class="mr-1 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-indigo-300 transition-all cursor-pointer"
+              @click="duplicateQuestion"
+            >
+              <i-fa icon="copy" class="m-auto" />
+            </div>
+            <div
+              @click="removeQuestion(index)"
+              class="mr-0 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-red-500 transition-all cursor-pointer"
+            >
+              <i-fa icon="trash" class="m-auto" />
+            </div>
+          </div>
         </div>
-      </transition>
-    </div>
+        <div
+          class="question"
+          :class="{ 'pointer-events-none': this.question != index }"
+        >
+          <span class="text-sm font-bold text-gray-300">Question</span>
+          <textarea
+            v-model="question.name"
+            class="block w-full rounded-lg text-xl resize-none bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            rows="3"
+          ></textarea>
+        </div>
+        <transition name="expand" appear mode="out-in">
+          <div
+            class="options mt-3 relative"
+            :class="{ 'pointer-events-none': this.question != index }"
+            v-show="this.question == index && question.type != 0"
+          >
+            <span
+              class="text-sm font-bold text-gray-300"
+              v-if="question.options.length"
+              >Options</span
+            >
+            <transition-group name="expand" appear>
+              <div
+                class="mb-2 mt-2 flex flex-row"
+                v-for="(option, index) in question.options"
+                :key="index"
+              >
+                <input
+                  class="flex-1 py-3 block w-full rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  type="text"
+                  v-if="question.type != 'image'"
+                  v-model="option.name"
+                  placeholder="name"
+                />
+                <div class="flex-1 flex" v-else>
+                  <div
+                    v-if="!option.name"
+                    class="w-full flex rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer"
+                    @click="launchFilePicker(index)"
+                  >
+                    <div class="p-2 ml-3 h-12 flex" v-if="!option.url">
+                      <i-fa icon="plus" class="my-auto mr-2" />
+                      <span class="my-auto"> Add Image </span>
+                    </div>
+                    <img
+                      v-if="option.url"
+                      class="ml-2 h-12 w-20 object-contain"
+                      :src="option.url"
+                      alt="image option"
+                    />
+
+                    <div
+                      class="flex flex-1 p-2 justify-between m-auto"
+                      v-if="option.url"
+                    >
+                      <div>{{ option.file.name }}</div>
+                      <div class="">{{ sizeFilter(option.size) }}</div>
+                    </div>
+                  </div>
+                  <div
+                    class="w-full flex rounded-md bg-gray-200 bg-opacity-40 border-0 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer"
+                    v-else-if="edit"
+                  >
+                    <img
+                      class="ml-2 h-12 w-20 object-contain"
+                      :src="url_host + option.name"
+                      alt="image option"
+                    />
+                  </div>
+                  <input
+                    type="file"
+                    ref="file"
+                    @change="onFileChange($event.target.files)"
+                    style="display: none"
+                  />
+                </div>
+                <div class="ml-2 flex flex-row my-auto" v-if="!edit">
+                  <div
+                    class="mr-1 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-indigo-300 transition-all cursor-pointer"
+                    @click="moveOption(index, 'up')"
+                  >
+                    <i-fa icon="chevron-up" class="m-auto" />
+                  </div>
+                  <div
+                    class="mr-1 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-indigo-300 transition-all cursor-pointer"
+                    @click="moveOption(index)"
+                  >
+                    <i-fa icon="chevron-down" class="m-auto" />
+                  </div>
+                  <div
+                    @click="removeOption(index)"
+                    class="mr-0 h-8 p-2 flex rounded-xl focus:outline-none text-gray-400 hover:text-white hover:bg-red-500 transition-all cursor-pointer"
+                  >
+                    <i-fa icon="trash" class="m-auto" />
+                  </div>
+                </div>
+              </div>
+            </transition-group>
+            <button
+              v-show="typeChecker(question) && !edit"
+              @click="addOption(question)"
+              class="mt-2 ring ring-green-400 ring-opacity-30 border-green-400 border-opacity-50 focus:outline-none w-full rounded-xl p-2 text-lg text-green-400 transition-all"
+            >
+              <i-fa icon="plus" class="mr-1" />Add Option
+            </button>
+          </div>
+        </transition>
+      </div>
+    </transition-group>
     <div class="flex justify-between">
       <div
         v-if="!edit"

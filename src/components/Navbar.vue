@@ -1,16 +1,52 @@
 <template>
   <div class="nav bg-white">
-    <div class="nav_logo" @click="goToHome">
-      <div class="logo">
-        <img :src="logo" alt="1337 logo" />
+    <div class="flex">
+      <div class="nav_logo" @click="goToHome">
+        <div class="logo">
+          <img :src="logo" alt="1337 logo" />
+        </div>
+        <div class="text">
+          <h1>PEER</h1>
+          <span>SURVEY</span>
+        </div>
       </div>
-      <div class="text">
-        <h1>PEER</h1>
-        <span>SURVEY</span>
+      <div
+        class="hidden sm:flex ml-2 pl-5 border-l-2 items-center"
+        v-if="$route.name == 'admin'"
+      >
+        <router-link class="mr-5 text-center" to="/admin/users">
+          <div class="">Users</div>
+          <div
+            class="w-16 h-1 rounded-t-lg mt-1 mx-auto bg-white transition-all"
+            :class="{ 'bg-indigo-500': $route.params.path == 'users' }"
+          ></div>
+        </router-link>
+        <router-link class="mr-5 text-center" to="/admin/surveys">
+          <div class="">Surveys</div>
+          <div
+            class="w-16 h-1 rounded-t-lg mt-1 mx-auto bg-white transition-all"
+            :class="{ 'bg-indigo-500': $route.params.path == 'surveys' }"
+          ></div>
+        </router-link>
+        <router-link class="mr-5 text-center" to="/admin/permissions">
+          <div class="">Permisions</div>
+          <div
+            class="w-16 h-1 rounded-t-lg mt-1 mx-auto bg-white transition-all"
+            :class="{ 'bg-indigo-500': $route.params.path == 'permissions' }"
+          ></div>
+        </router-link>
       </div>
     </div>
     <div class="nav_actions">
       <div class="action flex flex-row" v-if="user">
+        <router-link
+          v-if="$route.name != 'admin'"
+          class="link border-white flex my-auto mr-2 w-10 h-10 sm:h-auto sm:w-auto sm:p-2 rounded-full sm:rounded-xl text-white bg-black shadow-lg hover:shadow-none transition-all"
+          to="/admin"
+        >
+          <i-fa class="text-white m-auto sm:mr-2" icon="user-shield" />
+          <span class="hidden sm:block"> Admin</span>
+        </router-link>
         <div class="w-14 sm:w-16 rounded-full shadow-md overflow-hidden">
           <img
             class="w-full object-fill"
