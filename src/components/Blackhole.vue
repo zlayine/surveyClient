@@ -4,12 +4,16 @@
     <div class="ct">
       <div class="wp" :class="{ start: start }">
         <div class="blackhole" :class="{ explode: finish, start: start }"></div>
-        <transition name="fade">
-          <div class="planet" :class="{ start: start }" v-if="user">
-            <img class="rounded-full" :src="user.image_url" alt="img user" />
-          </div>
-        </transition>
+        <div class="planet" :class="{ start: start }" v-if="user">
+          <img class="rounded-full" :src="user.image_url" alt="img user" />
+        </div>
       </div>
+      <p
+        class="text-blackhole mx-auto w-2/3 text-center text-3xl"
+        :class="{ appear: finish }"
+      >
+        You have been blackholed
+      </p>
     </div>
   </div>
 </template>
@@ -158,6 +162,20 @@ export default {
   transition: 1s all;
 }
 
+.text-blackhole {
+  position: absolute;
+  top: 30vh;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  color: #fff;
+  transition: 1s all;
+}
+
+.text-blackhole.appear {
+  opacity: 1;
+}
+
 .planet.start {
   opacity: 1;
   animation: drain 12s normal 2s forwards ease-in;
@@ -193,8 +211,8 @@ export default {
 @media (max-width: 900px) {
   .planet {
     position: absolute;
-    top: -45vh;
-    left: 38vw;
+    top: -40vh;
+    left: 0vw;
     width: 4rem;
     height: 4rem;
     margin: -5px 0 0 -5px;
@@ -204,9 +222,9 @@ export default {
     transition: 1s all;
   }
 
-	.blackhole {
-		width: 40px;
-		height: 40px;
-	}
+  .blackhole {
+    width: 40px;
+    height: 40px;
+  }
 }
 </style>
