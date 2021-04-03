@@ -1,6 +1,6 @@
 <template>
   <div class="b1337">
-    <div class="space"></div>
+    <div class="space" :class="{ finish: finish }"></div>
     <div class="ct">
       <div class="wp" :class="{ start: start }">
         <div class="blackhole" :class="{ explode: finish, start: start }"></div>
@@ -92,6 +92,10 @@ export default {
   height: 400%;
   margin: -100% 0 0 -50%;
   opacity: 0.6;
+}
+
+.space.finish {
+  animation: spin unset;
 }
 
 .ct {
