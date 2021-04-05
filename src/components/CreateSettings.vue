@@ -37,7 +37,10 @@
               v-if="survey.organization != defaultOrg"
               class="flex justify-center items-center text-sm ring text-black w-1/2 h-full rounded-xl mt-1 ml-2 cursor-pointer shadow-md bg-white border border-gray-100 hover:shadow-none transition-all ring-indigo-300 max-h-11 relative z-10"
             >
-              <div class="w-10 bg-white m-1" v-if="survey.organization.logo_url">
+              <div
+                class="w-10 bg-white m-1"
+                v-if="survey.organization.logo_url"
+              >
                 <img
                   class="my-auto h-9"
                   :src="url_host + survey.organization.logo_url"
@@ -68,7 +71,7 @@
           </div>
           <div class="flex w-full sm:w-2/3 relative" v-else>
             <div
-              v-if="survey.organization == defaultOrg"
+              v-if="!survey.organization"
               class="flex justify-center ring items-center text-black text-xl w-1/2 h-full rounded-xl mt-1 cursor-pointer shadow-md bg-white border border-gray-100 hover:shadow-none transition-all ring-indigo-300"
             >
               <div class="w-20 bg-white m-1">
@@ -77,7 +80,7 @@
             </div>
 
             <div
-              v-else-if="survey.organization"
+              v-else-if="survey.organization != defaultOrg"
               class="flex justify-center ring items-center text-sm text-black w-1/2 h-full rounded-xl mt-1 cursor-pointer shadow-md bg-white border border-gray-100 hover:shadow-none transition-all ring-indigo-300 max-h-11 relative z-10"
             >
               <div class="w-10 bg-white m-1">
@@ -118,20 +121,12 @@
           </div>
         </label>
         <div class="w-full flex justify-between">
-          <button
-            @click="saveSurvey"
-            v-if="!edit"
-            class="bg-green-400 rounded-xl mt-auto px-6 py-2 text-white shadow-md focus:outline-none hover:shadow-none transition-all"
-          >
-            Save
-          </button>
           <div
             class="flex flex-col justify-center items-center mt-5"
             v-if="!edit"
           >
-            <span class="mb-2">Ready to publish ?</span>
             <button
-              @click="$emit('publish')"
+              @click="$emit('publish', survey)"
               class="bg-indigo-400 rounded-xl px-6 py-1 text-white shadow-md text-lg focus:outline-none hover:shadow-none transition-all"
             >
               Publish
@@ -185,7 +180,7 @@ import settingsImage from "@/assets/settings.svg";
 
 export default {
   props: ["edit"],
-  emits: ["save", "publish", "update", "updated"],
+  emits: ["publish", "update", "updated"],
   data() {
     return {
       show: false,
@@ -214,9 +209,6 @@ export default {
       this.confirm = false;
       await this.$store.dispatch("deleteSurvey", this.survey._id);
       this.$router.push({ name: "home", query: { filter: "new", page: 1 } });
-    },
-    saveSurvey() {
-      this.$emit("save", this.survey);
     },
   },
   computed: {

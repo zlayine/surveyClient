@@ -66,7 +66,6 @@
       />
       <create-settings
         v-show="page == 1"
-        @save="updateInfo"
         @publish="publish"
         @updated="checker"
         @update="updateSurveyInfo"
@@ -94,6 +93,7 @@ export default {
   created() {
     if (this.$route.name == "editsurvey") {
       this.edit = true;
+      this.page = 1;
       if (!this.surveyEdit || this.$route.params.id != this.surveyEdit._id)
         this.getSurvey();
     } else {
@@ -119,10 +119,16 @@ export default {
     updateQuestions(questions) {
       this.questions = questions;
       this.checker("save");
+      if (this.questionsValid) {
+        this.page = 1;
+        this.showNotif("Questions saved successfully", 0);
+      }
+      return this.questionsValid;
     },
     updateInfo(survey) {
       this.survey = survey;
       this.checker("info");
+      return this.infoValid;
     },
     checker(type) {
       if (type == "updated") this.questionsValid = false;
@@ -171,16 +177,17 @@ export default {
       if (this.infoValid)
         await this.$store.dispatch("updateSurvey", this.survey);
     },
-    async publish() {
-      if (!this.infoValid)
-        this.showNotif("Please save your survey settings..", 1);
-      else if (!this.questionsValid)
+    async publish(survey) {
+      if (!this.questionsValid)
         this.showNotif("Please save your survey questions..", 1);
-      else if (this.infoValid && this.questionsValid) {
-        this.questions = this.questions.map((q, index) => {
-          q.step = index;
-          return q;
-        });
+      else if (
+        (this.infoValid || this.updateInfo(survey)) &&
+        this.questionsValid
+      ) {
+        // this.questions = this.questions.map((q, index) => {
+        //   q.step = index;
+        //   return q;
+        // });
         this.survey.questions = this.questions;
         let obj = Object.assign({}, this.survey);
         let res = await this.$store.dispatch("createSurvey", obj);
