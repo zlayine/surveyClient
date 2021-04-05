@@ -106,9 +106,9 @@ export default {
       await this.$store.dispatch("getSurvey", this.$route.params.id);
       if (!this.survey) this.$router.push("/");
     },
-    submit() {
-      this.$store.dispatch("submitAnswers", this.answers);
-      this.$router.push("/");
+    async submit() {
+      let res = await this.$store.dispatch("submitAnswers", this.answers);
+      if (res) this.$router.push("/");
     },
   },
   async created() {

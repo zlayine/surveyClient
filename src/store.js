@@ -564,8 +564,14 @@ const store = createStore({
 						}
 					},
 				});
+				if (!res.data.errors || !check_errors(commit, res.data, "Submitting answers failed")) {
+					commit("SET_NOTIFICATION", { msg: "Answers submitted successfully!", error: 0 });
+					commit("DELETE_SURVEY", data._id)
+					commit("UPDATE_LOADING")
+					return "success";
+				}
 				commit("UPDATE_LOADING")
-				return "success";
+				return null;
 			} catch (error) {
 				console.log(error)
 				commit("SET_NOTIFICATION", { msg: "Failed to delete survey", error: 1 });
