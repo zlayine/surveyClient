@@ -124,7 +124,7 @@ const store = createStore({
 		//LOGIN
 		LOGIN(state, payload) {
 			state.isLogged = true;
-			state.currentUser = Object.assign({}, { id: payload.user._id, campus: payload.user.campus }, { token: payload.token });
+			state.currentUser = Object.assign({}, { id: payload.user._id, campus: payload.user.campus, role: payload.user.role }, { token: payload.token });
 			state.user = payload.user;
 			localStorage.setItem("user", JSON.stringify(state.currentUser));
 			axios.defaults.headers.common["Authorization"] = `Bearer ${state.currentUser.token}`
@@ -236,6 +236,34 @@ const store = createStore({
 			state.statsQuestions = null;
 		},
 
+		UPDATE_ADMIN_USERS(state, payload) {
+			state.admin.users = payload.users;
+			state.admin.totalUsers = payload.totalPages;
+		},
+		UPDATE_ADMIN_SURVEYS(state, payload) {
+			state.admin.surveys = payload.surveys;
+			state.admin.totalSurveys = payload.totalPages;
+		},
+		UPDATE_ADMIN_ORGS(state, payload) {
+			state.admin.organizations = payload.orgs;
+			state.admin.totalOrgs = payload.totalPages;
+		},
+		REMOVE_ADMIN_USER(state, payload) {
+			state.admin.users = state.admin.users.filter(u => u._id != payload);
+		},
+		REMOVE_ADMIN_SURVEY(state, payload) {
+			state.admin.surveys = state.admin.surveys.filter(u => u._id != payload);
+		},
+		REMOVE_ADMIN_ORG(state, payload) {
+			state.admin.organizations = state.admin.organizations.filter(u => u._id != payload);
+		},
+		ADMIN_UPDATE_USER_ROLE(state, payload) {
+			state.admin.users = state.admin.users.map(u => {
+				if (u._id == payload)
+					u.role = u.role == 'user' ? 'client' : 'user';
+				return u;
+			});
+		}
 	},
 	actions: {
 		async createUser({ commit }, code) {
@@ -822,10 +850,211 @@ const store = createStore({
 				return "success";
 			} catch (error) {
 				console.log(error)
-				commit("SET_NOTIFICATION", { msg: "Failed to update survey: " + error, error: 1 });
+				commit("SET_NOTIFICATION", { msg: "Failed to get user org: " + error, error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		},
+		async getAdminUsers({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						query { 
+							getAdminUsers(page: ${data.page}, campus: "${data.campus}", role: "${data.role}") {
+								page
+								totalPages
+								users {
+									_id
+									image_url
+									username
+									role
+									campus
+									createdAt
+								}
+							}
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, "Users fetch failed")) {
+					commit("UPDATE_ADMIN_USERS", res.data.data.getAdminUsers);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to get users: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async getAdminSurveys({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						query { 
+							getAdminSurveys(page: ${data.page}, campus: "${data.campus}") {
+								page
+								totalPages
+								surveys {
+									_id
+									name
+									organization {
+										name
+										logo_url
+									}
+									user {
+										username
+										image_url
+									}
+									description
+									campus
+									totalQuestions
+									createdAt
+								}
+							}
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, "Admin surveys fetch failed")) {
+					commit("UPDATE_ADMIN_SURVEYS", res.data.data.getAdminSurveys);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to get surveys: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async getAdminOrganizations({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						query { 
+							getAdminOrganizations(page: ${data.page}) {
+								page
+								totalPages
+								orgs {
+									_id
+									name
+									logo_url
+									user {
+										username
+									}
+									createdAt
+								}
+							}
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, "Admin orgs fetch failed")) {
+					commit("UPDATE_ADMIN_ORGS", res.data.data.getAdminOrganizations);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to get orgs: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async adminDeleteUser({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						mutation { 
+							adminDeleteUser(id: "${data}")
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, "Failed to remove user")) {
+					commit("REMOVE_ADMIN_USER", data);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to delete user: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async adminDeleteSurvey({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				let res = await deleteSurvey(data);
+				if (!res.data.errors || !check_errors(commit, res.data, "Failed to remove survey")) {
+					commit("REMOVE_ADMIN_SURVEY", data);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to delete organization: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async adminDeleteOrganization({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						mutation { 
+							deleteOrganization(id: "${data}")
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, "Cannot delete, Organization already attached to a survey..")) {
+					commit("REMOVE_ADMIN_ORG", data);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to delete organization: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async updateUserRole({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						mutation { 
+							updateUserRole(id: "${data}")
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, "Cannot update user role")) {
+					commit("ADMIN_UPDATE_USER_ROLE", data);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to delete organization: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		}
 	}
 })
 

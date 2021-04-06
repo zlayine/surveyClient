@@ -151,7 +151,7 @@
 
 <script>
 export default {
-  emits: ["select"],
+  emits: ["select", "cancel"],
   data() {
     return {
       selected: 0,

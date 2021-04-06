@@ -1,68 +1,38 @@
 <template>
   <div class="text-gray-900">
-    <div class="p-4 flex justify-between">
-      <h1 class="text-3xl">Users</h1>
-      <div class="flex">
-        <select
-          v-model="role"
-          @change="fetchUsers"
-          class="block mt-1 mr-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        >
-          <option value="0">Filter by role</option>
-          <option value="user">User</option>
-          <option value="client">Client</option>
-        </select>
-        <select
-          v-model="campus"
-          @change="fetchUsers"
-          class="block mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        >
-          <option value="0">Filter by campus</option>
-          <option>Khouribga</option>
-          <option>Benguerir</option>
-        </select>
-      </div>
+    <div class="p-4 flex">
+      <h1 class="text-3xl">Organizations</h1>
     </div>
     <div class="px-3 py-4 flex justify-center">
       <table class="w-full text-md bg-white shadow-md rounded mb-4">
         <tbody>
           <tr class="border-b">
             <th class="text-left p-3 px-5"></th>
-            <th class="text-left p-3 px-5">Username</th>
-            <th class="text-left p-3 px-5">Role</th>
-            <th class="text-left p-3 px-5">Campus</th>
-            <th class="text-left p-3 px-5">Join date</th>
+            <th class="text-left p-3 px-5">Name</th>
+            <th class="text-left p-3 px-5">User</th>
+            <th class="text-left p-3 px-5">Created At</th>
             <th></th>
           </tr>
           <tr
             class="border-b hover:bg-orange-100 bg-gray-100"
-            v-for="user in users"
-            :key="user._id"
+            v-for="org in orgs"
+            :key="org._id"
           >
             <td class="p-3 px-5">
               <img
                 class="w-12 h-12 overflow-hidden rounded-full"
-                :src="user.image_url"
+                :src="url_host + org.logo_url"
                 alt="user img"
               />
             </td>
-            <td class="p-3 px-5">{{ user.username }}</td>
-            <td class="p-3 px-5">{{ user.role }}</td>
-            <td class="p-3 px-5">{{ user.campus }}</td>
-            <td class="p-3 px-5">{{ formatDate(user.createdAt) }}</td>
+            <td class="p-3 px-5">{{ org.name }}</td>
+            <td class="p-3 px-5">{{ org.user.username }}</td>
+            <td class="p-3 px-5">{{ formatDate(org.createdAt) }}</td>
             <td class="p-3 px-5">
               <div class="flex justify-end">
                 <button
                   type="button"
-                  v-if="user.role != 'admin'"
-                  @click="updateRole(user._id)"
-                  class="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline transition-all"
-                >
-                  Change to {{ user.role == "user" ? "client" : "user" }}
-                </button>
-                <button
-                  type="button"
-                  @click="selected = user._id"
+                  @click="selected = org._id"
                   class="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline transition-all"
                 >
                   Delete
@@ -109,7 +79,7 @@
     <transition name="fade">
       <confirm-dialog
         v-show="selected != null"
-        @delete="deleteUser"
+        @delete="deleteOrg"
         @cancel="selected = null"
         title="Delete Organization"
         message="Are you sure you want to delete this organization ?"
@@ -126,9 +96,8 @@ export default {
   data() {
     return {
       page: 1,
-      campus: 0,
-      role: 0,
       url_host: import.meta.env.VITE_API_HOST,
+      selected: null,
     };
   },
   created() {
@@ -138,14 +107,14 @@ export default {
     this.$router.replace({
       query: { page: this.page },
     });
-    if (!this.users.length) this.fetchUsers();
+    if (!this.orgs.length) this.fetchOrgs();
   },
   methods: {
     formatDate(val) {
       return moment(String(val)).format("DD/MM/YYYY");
     },
-    fetchUsers() {
-      this.$store.dispatch("getAdminUsers", {
+    fetchOrgs() {
+      this.$store.dispatch("getAdminOrganizations", {
         page: this.page,
         campus: this.campus,
         role: this.role,
@@ -155,22 +124,19 @@ export default {
       this.page = page;
       this.$router.replace({ query: { page: this.page } });
       window.scrollTo(0, 0);
-      this.fetchUsers();
+      this.fetchOrgs();
     },
-    async deleteUser() {
+    async deleteOrg() {
       this.selected = null;
-      await this.$store.dispatch("adminDeleteUser", this.selected);
-    },
-    async updateRole(id) {
-      await this.$store.dispatch("updateUserRole", id);
+      await this.$store.dispatch("adminDeleteOrganization", this.selected);
     },
   },
   computed: {
-    users() {
-      return this.$store.getters.adminUsers;
+    orgs() {
+      return this.$store.getters.adminOrgs;
     },
     pages() {
-      return this.$store.getters.adminTotalUsers;
+      return this.$store.getters.adminTotalOrgs;
     },
   },
   components: {

@@ -58,6 +58,14 @@ const routes = [
 		}
 	},
 	{
+		path: "/admin",
+		name: "admin-redirect",
+		component: Admin,
+		meta: {
+			requiresAuth: true,
+		}
+	},
+	{
 		path: "/auth",
 		name: "auth",
 		component: Auth,

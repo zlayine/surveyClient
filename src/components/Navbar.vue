@@ -12,7 +12,7 @@
       </div>
       <div
         class="hidden sm:flex ml-2 pl-5 border-l-2 items-center"
-        v-if="$route.name == 'admin'"
+        v-if="$route.name == 'admin' || $route.name == 'admin-redirect'"
       >
         <router-link class="mr-5 text-center" to="/admin/users">
           <div class="">Users</div>
@@ -35,18 +35,25 @@
             :class="{ 'bg-indigo-500': $route.params.path == 'permissions' }"
           ></div>
         </router-link>
+				<router-link class="mr-5 text-center" to="/admin/organizations">
+          <div class="">Organizations</div>
+          <div
+            class="w-16 h-1 rounded-t-lg mt-1 mx-auto bg-white transition-all"
+            :class="{ 'bg-indigo-500': $route.params.path == 'organizations' }"
+          ></div>
+        </router-link>
       </div>
     </div>
     <div class="nav_actions">
       <div class="action flex flex-row" v-if="user">
-        <!-- <router-link
+        <router-link
           v-if="$route.name != 'admin'"
           class="link border-white flex my-auto mr-2 w-10 h-10 sm:h-auto sm:w-auto sm:p-2 rounded-full sm:rounded-xl text-white bg-black shadow-lg hover:shadow-none transition-all"
           to="/admin"
         >
           <i-fa class="text-white m-auto sm:mr-2" icon="user-shield" />
           <span class="hidden sm:block"> Admin</span>
-        </router-link> -->
+        </router-link>
         <div class="w-14 sm:w-16 rounded-full shadow-md overflow-hidden">
           <img
             class="w-full object-fill"
