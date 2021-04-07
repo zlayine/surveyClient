@@ -12,7 +12,7 @@
       </div>
       <div
         class="hidden sm:flex ml-2 pl-5 border-l-2 items-center"
-        v-if="$route.name == 'admin' || $route.name == 'admin-redirect'"
+        v-if="user && user.role == 'admin' && ($route.name == 'admin' || $route.name == 'admin-redirect')"
       >
         <router-link class="mr-5 text-center" to="/admin/users">
           <div class="">Users</div>
@@ -47,7 +47,7 @@
     <div class="nav_actions">
       <div class="action flex flex-row" v-if="user">
         <router-link
-          v-if="$route.name != 'admin'"
+          v-if="$route.name != 'admin' && user.role == 'admin'"
           class="link border-white flex my-auto mr-2 w-10 h-10 sm:h-auto sm:w-auto sm:p-2 rounded-full sm:rounded-xl text-white bg-black shadow-lg hover:shadow-none transition-all"
           to="/admin"
         >

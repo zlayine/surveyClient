@@ -95,6 +95,8 @@ const store = createStore({
 			totalOrgs: 0,
 			surveys: [],
 			totalSurveys: 0,
+			permissions: [],
+			totalPerms: 0,
 		}
 	},
 	getters: {
@@ -118,13 +120,15 @@ const store = createStore({
 		adminTotalUsers: state => state.admin.totalUsers,
 		adminOrgs: state => state.admin.organizations,
 		adminTotalOrgs: state => state.admin.totalOrgs,
+		adminPerms: state => state.admin.permissions,
+		adminTotalPerms: state => state.admin.totalPerms,
 		organizations: state => state.organizations,
 	},
 	mutations: {
 		//LOGIN
 		LOGIN(state, payload) {
 			state.isLogged = true;
-			state.currentUser = Object.assign({}, { id: payload.user._id, campus: payload.user.campus, role: payload.user.role }, { token: payload.token });
+			state.currentUser = Object.assign({}, { id: payload.user._id, campus: payload.user.campus }, { token: payload.token });
 			state.user = payload.user;
 			localStorage.setItem("user", JSON.stringify(state.currentUser));
 			axios.defaults.headers.common["Authorization"] = `Bearer ${state.currentUser.token}`
@@ -263,6 +267,13 @@ const store = createStore({
 					u.role = u.role == 'user' ? 'client' : 'user';
 				return u;
 			});
+		},
+		ADMIN_UPDATE_PERMISSIONS(state, payload) {
+			state.admin.permissions = payload.perms;
+			state.admin.totalPerms = payload.totalPages;
+		},
+		ADMIN_REMOVE_PERMISSION(state, payload) {
+			state.admin.permissions = state.admin.permissions.filter(u => u._id != payload);
 		}
 	},
 	actions: {
@@ -585,10 +596,10 @@ const store = createStore({
 						query: `
 							mutation SubmitAnswers(
 								$input: [AnswerInput!]!) { 
-								submitAnswers (input: $input)
+								submitAnswers (id: "${data.id}", input: $input)
 							}
 					`, variables: {
-							input: data
+							input: data.input
 						}
 					},
 				});
@@ -602,7 +613,7 @@ const store = createStore({
 				return null;
 			} catch (error) {
 				console.log(error)
-				commit("SET_NOTIFICATION", { msg: "Failed to delete survey", error: 1 });
+				commit("SET_NOTIFICATION", { msg: "Failed to submit answers", error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		},
@@ -730,6 +741,7 @@ const store = createStore({
 									name
 								}
 								user {
+									_id
 									username
 									image_url
 								}
@@ -758,8 +770,9 @@ const store = createStore({
 						`
 					}
 				});
-
-				commit('UPDATE_SURVEY_STATS', res.data.data.getSurveyAnswers);
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit('UPDATE_SURVEY_STATS', res.data.data.getSurveyAnswers);
+				}
 				commit("UPDATE_LOADING");
 				return "success";
 			} catch (error) {
@@ -787,7 +800,7 @@ const store = createStore({
 					},
 				});
 				commit("UPDATE_LOADING")
-				if (!res.data.errors || !check_errors(commit, res.data, "Update questions failed")) {
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
 					commit("SET_NOTIFICATION", { msg: "Questions updated successfully!", error: 1 });
 				}
 				return "success";
@@ -814,7 +827,7 @@ const store = createStore({
 						}
 					},
 				});
-				if (!res.data.errors || !check_errors(commit, res.data, "Update survey failed")) {
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
 					commit("SET_NOTIFICATION", { msg: "Survey updated successfully!", error: 0 });
 					commit("UPDATE_SURVEY_INFO", data);
 				}
@@ -843,7 +856,7 @@ const store = createStore({
 						}
 					`}
 				});
-				if (!res.data.errors || !check_errors(commit, res.data, "Organizations fetch failed")) {
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
 					commit("UPDATE_USER_ORG", res.data.data.getUserOrganizations);
 				}
 				commit("UPDATE_LOADING")
@@ -878,7 +891,7 @@ const store = createStore({
 						}
 					`}
 				});
-				if (!res.data.errors || !check_errors(commit, res.data, "Users fetch failed")) {
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
 					commit("UPDATE_ADMIN_USERS", res.data.data.getAdminUsers);
 				}
 				commit("UPDATE_LOADING")
@@ -921,7 +934,7 @@ const store = createStore({
 						}
 					`}
 				});
-				if (!res.data.errors || !check_errors(commit, res.data, "Admin surveys fetch failed")) {
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
 					commit("UPDATE_ADMIN_SURVEYS", res.data.data.getAdminSurveys);
 				}
 				commit("UPDATE_LOADING")
@@ -957,7 +970,7 @@ const store = createStore({
 						}
 					`}
 				});
-				if (!res.data.errors || !check_errors(commit, res.data, "Admin orgs fetch failed")) {
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
 					commit("UPDATE_ADMIN_ORGS", res.data.data.getAdminOrganizations);
 				}
 				commit("UPDATE_LOADING")
@@ -981,7 +994,8 @@ const store = createStore({
 						}
 					`}
 				});
-				if (!res.data.errors || !check_errors(commit, res.data, "Failed to remove user")) {
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("SET_NOTIFICATION", { msg: "User deleted successfully!", error: 0 });
 					commit("REMOVE_ADMIN_USER", data);
 				}
 				commit("UPDATE_LOADING")
@@ -996,7 +1010,8 @@ const store = createStore({
 			try {
 				commit("UPDATE_LOADING")
 				let res = await deleteSurvey(data);
-				if (!res.data.errors || !check_errors(commit, res.data, "Failed to remove survey")) {
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("SET_NOTIFICATION", { msg: "Survey deleted successfully!", error: 0 });
 					commit("REMOVE_ADMIN_SURVEY", data);
 				}
 				commit("UPDATE_LOADING")
@@ -1020,7 +1035,8 @@ const store = createStore({
 						}
 					`}
 				});
-				if (!res.data.errors || !check_errors(commit, res.data, "Cannot delete, Organization already attached to a survey..")) {
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("SET_NOTIFICATION", { msg: "Organization deleted successfully!", error: 0 });
 					commit("REMOVE_ADMIN_ORG", data);
 				}
 				commit("UPDATE_LOADING")
@@ -1044,7 +1060,8 @@ const store = createStore({
 						}
 					`}
 				});
-				if (!res.data.errors || !check_errors(commit, res.data, "Cannot update user role")) {
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("SET_NOTIFICATION", { msg: "User role updated!", error: 0 });
 					commit("ADMIN_UPDATE_USER_ROLE", data);
 				}
 				commit("UPDATE_LOADING")
@@ -1052,6 +1069,141 @@ const store = createStore({
 			} catch (error) {
 				console.log(error)
 				commit("SET_NOTIFICATION", { msg: "Failed to delete organization: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async getPermissions({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						query { 
+							getPermissions(page: ${data.page}) {
+								page
+								totalPages
+								perms {
+									_id
+									description
+									user {
+										username
+										image_url
+									}
+									createdAt
+								}
+							}
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("ADMIN_UPDATE_PERMISSIONS", res.data.data.getPermissions);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to delete organization: " + error, error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async createPermission({ commit }, data) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						mutation { 
+							createPermission(description: "${data}")
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("SET_NOTIFICATION", { msg: "Permission created successfully", error: 0 });
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to create permission", error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async getUserPermission({ commit }) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						query { 
+							getUserPermission
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("UPDATE_LOADING")
+					return res.data.data.getUserPermission;
+				}
+				commit("UPDATE_LOADING")
+				return null;
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to create permission", error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async adminRemovePermission({ commit }, id) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						mutation { 
+							adminDeletePermission(id: "${id}")
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("SET_NOTIFICATION", { msg: "Permission removed successfully", error: 0 });
+					commit('ADMIN_REMOVE_PERMISSION', id);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to remove permission", error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async adminApprovePermission({ commit }, id) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						mutation { 
+							adminApprovePermission(id: "${id}")
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("SET_NOTIFICATION", { msg: "Permission approved successfully", error: 0 });
+					commit('ADMIN_REMOVE_PERMISSION', id);
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to approve permission", error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		}

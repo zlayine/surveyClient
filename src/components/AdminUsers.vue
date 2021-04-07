@@ -128,6 +128,7 @@ export default {
       page: 1,
       campus: 0,
       role: 0,
+      selected: null,
       url_host: import.meta.env.VITE_API_HOST,
     };
   },
@@ -158,8 +159,8 @@ export default {
       this.fetchUsers();
     },
     async deleteUser() {
+			await this.$store.dispatch("adminDeleteUser", this.selected);
       this.selected = null;
-      await this.$store.dispatch("adminDeleteUser", this.selected);
     },
     async updateRole(id) {
       await this.$store.dispatch("updateUserRole", id);

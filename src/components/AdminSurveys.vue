@@ -129,6 +129,7 @@ export default {
     return {
       page: 1,
       campus: 0,
+      selected: null,
       url_host: import.meta.env.VITE_API_HOST,
     };
   },
@@ -159,8 +160,8 @@ export default {
       this.fetchSurveys();
     },
     async deleteSurvey() {
+			await this.$store.dispatch("adminDeleteSurvey", this.selected);
       this.selected = null;
-      await this.$store.dispatch("adminDeleteSurvey", this.selected);
     },
   },
   computed: {

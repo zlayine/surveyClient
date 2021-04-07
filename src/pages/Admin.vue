@@ -1,11 +1,17 @@
 <template>
   <div class="container mx-auto pt-5 px-3 sm:px-10 mb-32">
-    <!-- <transition name="fade"> -->
-    <admin-users v-if="page == 'users'" />
-    <admin-surveys v-else-if="page == 'surveys'" />
-    <admin-permissions v-else-if="page == 'permissions'" />
-    <admin-organizations v-else-if="page == 'organizations'" />
-    <!-- </transition> -->
+    <transition name="fade">
+      <admin-users v-if="page == 'users'" />
+    </transition>
+    <transition name="fade">
+      <admin-surveys v-if="page == 'surveys'" />
+    </transition>
+    <transition name="fade">
+      <admin-permissions v-if="page == 'permissions'" />
+    </transition>
+    <transition name="fade">
+      <admin-organizations v-if="page == 'organizations'" />
+    </transition>
   </div>
 </template>
 
@@ -24,17 +30,18 @@ export default {
   data() {
     return {};
   },
-  created() {
-    // if (this.user.role != "admin") this.$router.push("/");
+  mounted() {
+    if (this.user && this.user.role != "admin") {
+      this.$router.push({ name: "home" });
+    }
   },
-  mounted() {},
   computed: {
     page() {
       if (!this.$route.params.path) return "users";
       return this.$route.params.path;
     },
     user() {
-      return this.$store.getters.currentUser;
+      return this.$store.getters.user;
     },
   },
 };

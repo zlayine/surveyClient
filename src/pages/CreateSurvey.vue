@@ -90,24 +90,30 @@ export default {
       edit: false,
     };
   },
-  created() {
+  async created() {
     if (this.$route.name == "editsurvey") {
       this.edit = true;
       this.page = 1;
       if (!this.surveyEdit || this.$route.params.id != this.surveyEdit._id)
-        this.getSurvey();
+        await this.getSurvey();
+      if (
+        this.user &&
+        this.user.role != "admin" &&
+        this.user._id != this.surveyEdit.user._id
+      ) {
+        this.showNotif("You must be an owner to modify the survey", 1);
+        this.$router.push("/");
+      }
     } else {
       this.$store.commit("CLEAR_SURVEY");
     }
   },
-  // watch: {
-  //   "$route.path": function (val, oldVal) {
-  //     if (this.$route.name != "editsurvey") {
-  //       this.edit = false;
-  //       this.$store.commit("CLEAR_SURVEY");
-  //     }
-  //   },
-  // },
+  mounted() {
+    if (this.user && !this.edit && this.user.role == "user") {
+      this.showNotif("You must be a client to create a survey", 1);
+      this.$router.push("/");
+    }
+  },
   methods: {
     showNotif(message, error = 0) {
       this.$store.commit("SET_NOTIFICATION", { msg: message, error: error });
@@ -198,6 +204,9 @@ export default {
   computed: {
     surveyEdit() {
       return this.$store.getters.survey;
+    },
+    user() {
+      return this.$store.getters.user;
     },
   },
   components: { CreateQuestions, CreateSettings },

@@ -23,6 +23,7 @@
         @click="selectOption(item)"
         @input="setInput"
         :select="selected"
+        ref="option"
       />
     </div>
   </div>
@@ -42,10 +43,14 @@ export default {
   watch: {
     question() {
       this.selected = [];
+      this.$refs.option.input = null;
     },
     answer() {
-      if (!this.selected.length && this.answer.length)
+      if (!this.selected.length && this.answer.length) {
         this.selected = this.answer;
+        if (this.question.question_type.type == "text")
+          this.$refs.option.input = this.selected[0].name;
+      }
     },
   },
   methods: {

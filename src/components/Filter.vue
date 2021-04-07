@@ -6,10 +6,19 @@
     <router-link
       class="text-xl justify-center mt-3 sm:mt-0 flex my-auto sm:px-4 py-2 rounded-xl text-white bg-indigo-500 shadow-lg hover:shadow-none transition-all"
       to="/addsurvey"
+      v-if="user && user.role != 'user'"
     >
       <i-fa class="text-white mr-2 my-auto" icon="plus" />
       <span class=""> Create Survey</span>
     </router-link>
+    <button
+      @click="show = true"
+      class="text-xl justify-center mt-3 sm:mt-0 focus:outline-none outline-none flex my-auto sm:px-4 py-2 rounded-xl text-white bg-indigo-500 shadow-lg hover:shadow-none transition-all"
+      v-else
+    >
+      <i-fa class="text-white mr-2 my-auto" icon="plus" />
+      <span class=""> Ask Permission</span>
+    </button>
     <div class="flex justify-center rounded-lg text-lg" role="group">
       <button
         class="focus:outline-none hover:bg-indigo-500 hover:text-white border border-r-0 border-indigo-500 rounded-l-lg px-4 py-1 sm:py-2 mx-0 outline-none focus:shadow-outline transition-all"
@@ -45,10 +54,12 @@
         Completed
       </button>
     </div>
+    <create-permission-dialog v-if="show" @cancel="show = false" />
   </div>
 </template>
 
 <script>
+import CreatePermissionDialog from "./CreatePermissionDialog.vue";
 export default {
   props: ["current"],
   emits: ["change"],
@@ -58,6 +69,7 @@ export default {
   data() {
     return {
       selected: 0,
+      show: false,
       titles: ["New Surveys", "My Surveys", "Completed Surveys"],
       filters: ["new", "mine", "completed"],
     };
@@ -66,6 +78,14 @@ export default {
     selected(val) {
       this.$emit("change", this.filters[val]);
     },
+  },
+  computed: {
+    user() {
+      return this.$store.getters.user;
+    },
+  },
+  components: {
+    CreatePermissionDialog,
   },
 };
 </script>

@@ -122,7 +122,12 @@ export default {
       return moment(String(val)).format("DD/MM/YYYY");
     },
     async shareSurvey() {
-      await toClipboard(import.meta.env.VITE_URL + "survey/" + this.$route.params.id + "?share=true");
+      await toClipboard(
+        import.meta.env.VITE_URL +
+          "survey/" +
+          this.$route.params.id +
+          "?share=true"
+      );
       this.$store.commit("SET_NOTIFICATION", {
         msg: "Sharable link coppied to clipboard",
         error: 0,
@@ -134,12 +139,21 @@ export default {
     // if (!this.survey || this.$route.params.id != this.survey._id)
     this.$store.commit("CLEAR_STATS");
     await this.getStats();
+    if (
+      this.user &&
+      this.user.role != "admin" &&
+      this.user._id != this.survey.user._id
+    )
+      this.$router.push("/");
   },
   computed: {
     survey() {
       let survey = this.$store.getters.surveyStats;
       if (survey) this.selected = 0;
       return this.$store.getters.surveyStats;
+    },
+    user() {
+      return this.$store.getters.user;
     },
   },
   components: {

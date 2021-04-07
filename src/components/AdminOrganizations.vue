@@ -127,8 +127,8 @@ export default {
       this.fetchOrgs();
     },
     async deleteOrg() {
-      this.selected = null;
       await this.$store.dispatch("adminDeleteOrganization", this.selected);
+      this.selected = null;
     },
   },
   computed: {
