@@ -1,5 +1,35 @@
 <template>
   <div class="container mx-auto pt-5 px-3 sm:px-10 mb-32">
+    <div class="justify-between overflow-x-auto flex sm:hidden">
+      <router-link class="mr-5 text-center text-smr" to="/admin/users">
+        <div class="">Users</div>
+        <div
+          class="w-16 h-1 rounded-t-lg mt-1 mx-auto bg-gray-100 transition-all"
+          :class="{ 'bg-indigo-500': $route.params.path == 'users' }"
+        ></div>
+      </router-link>
+      <router-link class="mr-5 text-center text-sm" to="/admin/surveys">
+        <div class="">Surveys</div>
+        <div
+          class="w-16 h-1 rounded-t-lg mt-1 mx-auto bg-gray-100 transition-all"
+          :class="{ 'bg-indigo-500': $route.params.path == 'surveys' }"
+        ></div>
+      </router-link>
+      <router-link class="mr-5 text-center text-sm" to="/admin/permissions">
+        <div class="">Permisions</div>
+        <div
+          class="w-16 h-1 rounded-t-lg mt-1 mx-auto bg-gray-100 transition-all"
+          :class="{ 'bg-indigo-500': $route.params.path == 'permissions' }"
+        ></div>
+      </router-link>
+      <router-link class="mr-5 text-center text-sm" to="/admin/organizations">
+        <div class="">Organizations</div>
+        <div
+          class="w-16 h-1 rounded-t-lg mt-1 mx-auto bg-gray-100 transition-all"
+          :class="{ 'bg-indigo-500': $route.params.path == 'organizations' }"
+        ></div>
+      </router-link>
+    </div>
     <transition name="fade">
       <admin-users v-if="page == 'users'" />
     </transition>

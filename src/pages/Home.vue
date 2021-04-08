@@ -1,9 +1,11 @@
 <template>
-  <div class="container mx-auto pt-5 px-3 sm:px-10 mb-32">
+  <div class="lg:container mx-auto pt-5 px-3 sm:px-10 mb-32">
     <filter-layout @change="changeFilter" :current="filter" />
     <div class="w-full sm:w-1/4 mx-auto" v-if="!surveys.length">
       <img class="w-full" :src="empty_img" alt="empty image" />
-			<div class="text-center mt-2 text-xl">No surveys around this corner..</div>
+      <div class="text-center mt-2 text-xl">
+        No surveys around this corner..
+      </div>
     </div>
     <div class="flex flex-row justify-between mt-3 flex-wrap">
       <survey-item v-for="item in surveys" :key="item._id" :survey="item" />
@@ -64,8 +66,9 @@ export default {
     if (filter) this.filter = filter;
 
     this.$router.replace({ query: { filter: this.filter, page: this.page } });
-    if (!this.surveys.length) this.fetchSurveys();
+    this.fetchSurveys();
   },
+
   methods: {
     async fetchSurveys() {
       let args = { page: this.page, filter: this.filter };

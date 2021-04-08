@@ -211,15 +211,29 @@ export default {
       this.$router.push({ name: "home", query: { filter: "new", page: 1 } });
     },
   },
+  mounted() {
+    if (this.edit && this.surveyEdit) {
+      this.survey = {
+        _id: this.surveyEdit._id,
+        name: this.surveyEdit.name,
+        description: this.surveyEdit.description,
+        organization: this.surveyEdit.organization,
+        campus: this.surveyEdit.campus,
+      };
+    }
+  },
   computed: {
     surveyEdit() {
       let survey = this.$store.getters.survey;
       if (this.edit && this.$store.getters.survey) {
-        this.survey._id = survey._id;
-        this.survey.name = survey.name;
-        this.survey.description = survey.description;
-        this.survey.campus = survey.campus;
-        this.survey.organization = survey.organization;
+        this.survey = {
+          _id: survey._id,
+          name: survey.name,
+          description: survey.description,
+          organization: survey.organization,
+          campus: survey.campus,
+        };
+        return this.$store.getters.survey;
       } else {
         this.survey = {
           name: null,

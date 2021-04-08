@@ -3,7 +3,7 @@
     <div class="p-4 flex">
       <h1 class="text-3xl">Permissions</h1>
     </div>
-    <div class="px-3 py-4 flex justify-center">
+    <div class="px-3 py-4 overflow-x-auto">
       <table class="w-full text-md bg-white shadow-md rounded mb-4">
         <tbody>
           <tr class="border-b">
@@ -18,12 +18,14 @@
             v-for="perm in perms"
             :key="perm._id"
           >
-            <td class="p-3 px-5">
-              <img
-                class="w-12 h-12 overflow-hidden rounded-full"
-                :src="perm.user.image_url"
-                alt="user img"
-              />
+            <td class="sm:p-3 sm:px-5">
+              <div class="w-12 h-12 mx-2">
+                <img
+                  class="w-full overflow-hidden rounded-full"
+                  :src="perm.user.image_url"
+                  alt="user img"
+                />
+              </div>
             </td>
             <td class="p-3 px-5">{{ perm.user.username }}</td>
             <td class="p-3 px-5">{{ perm.description }}</td>

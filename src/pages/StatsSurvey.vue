@@ -16,52 +16,55 @@
           </button>
         </router-link>
       </div>
-      <div class="flex mb-3" v-if="survey">
-        <div
-          class="w-16 flex mb-auto rounded-full overflow-hidden shadow-md mr-3 sm:mr-5"
-        >
-          <img
-            class="w-16 h-16 overflow-hidden rounded-full"
-            v-if="survey.organization"
-            :src="url_host + survey.organization.logo_url"
-            alt="user img"
-          />
-          <img
-            class="w-16 h-16 p-3 border border-gray-100 overflow-hidden rounded-full"
-            v-else
-            :src="logo1337"
-            alt="user img"
-          />
-        </div>
-        <div class="flex flex-1 flex-col my-auto">
+      <div class="flex md:flex-row flex-col mb-3" v-if="survey">
+        <div class="flex flex-1">
           <div
-            class="text-sm sm:text-xl uppercase font-bold tracking-wider break-words"
+            class="w-16 flex mb-auto rounded-full overflow-hidden shadow-md mr-3 sm:mr-5"
           >
-            {{ survey.name }}
+            <img
+              class="w-16 h-16 overflow-hidden rounded-full"
+              v-if="survey.organization"
+              :src="url_host + survey.organization.logo_url"
+              alt="user img"
+            />
+            <img
+              class="w-16 h-16 p-3 border border-gray-100 overflow-hidden rounded-full"
+              v-else
+              :src="logo1337"
+              alt="user img"
+            />
           </div>
-          <div class="subtitle flex mb-1">
-            <h6 class="username mr-1 text-gray-500">
-              {{ survey.user.username }}
-            </h6>
-            <h6 class="date text-gray-600">
-              at {{ formatDate(survey.createdAt) }}
-            </h6>
+          <div class="flex flex-1 flex-col my-auto">
+            <div
+              class="text-sm sm:text-xl uppercase font-bold tracking-wider break-words"
+            >
+              {{ survey.name }}
+            </div>
+            <div class="subtitle flex mb-1">
+              <h6 class="username mr-1 text-gray-500">
+                {{ survey.user.username }}
+              </h6>
+              <h6 class="date text-gray-600">
+                at {{ formatDate(survey.createdAt) }}
+              </h6>
+            </div>
           </div>
         </div>
-        <div class="flex my-auto">
+
+        <div class="flex my-auto justify-center md:mt-2">
           <div
             class="bg-indigo-400 text-white px-3 py-2 rounded-xl shadow-md hover:shadow-none cursor-pointer mr-2"
             @click="exportSurvey"
           >
             <i-fa icon="download" />
-            <span class="hidden ml-1 sm:inline-block">Export</span>
+            <span class=" ml-1 sm:inline-block">Export</span>
           </div>
           <div
             class="bg-indigo-400 text-white px-3 py-2 rounded-xl shadow-md hover:shadow-none cursor-pointer mr-2"
             @click="shareSurvey"
           >
             <i-fa icon="share-alt" />
-            <span class="hidden ml-1 sm:inline-block">Share</span>
+            <span class=" ml-1 sm:inline-block">Share</span>
           </div>
         </div>
       </div>

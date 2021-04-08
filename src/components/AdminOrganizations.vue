@@ -3,7 +3,7 @@
     <div class="p-4 flex">
       <h1 class="text-3xl">Organizations</h1>
     </div>
-    <div class="px-3 py-4 flex justify-center">
+    <div class="px-3 py-4 overflow-x-auto">
       <table class="w-full text-md bg-white shadow-md rounded mb-4">
         <tbody>
           <tr class="border-b">

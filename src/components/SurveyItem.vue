@@ -1,55 +1,60 @@
 <template>
-  <div class="survey w-full sm:w-1/2 flex sm:p-3 h-56 mb-5">
+  <div class="survey w-full md:w-1/2 flex md:p-3 h-56 mb-5">
     <div
       class="bg-white w-full flex flex-row p-2 rounded-lg shadow-xl h-56 relative overflow-hidden"
     >
-      <router-link :to="`/editsurvey/${survey._id}`"  v-if="user && (user.role == 'admin' || user._id == survey.user._id)">
+      <router-link
+        :to="`/editsurvey/${survey._id}`"
+        v-if="user && (user.role == 'admin' || user._id == survey.user._id)"
+      >
         <button
-          class="absolute w-8 h-8 sm:w-10 sm:h-10 focus:outline-none outline-none bg-indigo-200 rounded-bl-lg top-0 right-0 sm:-right-1 sm:-top-1 flex justify-center cursor-pointer shadow-lg hover:shadow-none transition-all"
+          class="absolute w-8 h-8 md:w-10 md:h-10 focus:outline-none outline-none bg-indigo-200 rounded-bl-lg top-0 right-0 md:-right-1 md:-top-1 flex justify-center cursor-pointer shadow-lg hover:shadow-none transition-all"
         >
           <i-fa
-            class="text-indigo-600 text-xl mt-auto mr-auto ml-1.5 mb-1.5 sm:ml-2 sm:mb-2"
+            class="text-indigo-600 text-xl mt-auto mr-auto ml-1.5 mb-1.5 md:ml-2 md:mb-2"
             icon="edit"
           />
         </button>
       </router-link>
-      <div
-        class="user sm:flex w-28 hidden mb-auto rounded-full overflow-hidden shadow-md sm:mx-5"
-      >
-        <img
-          class="w-28 h-28 overflow-hidden rounded-full"
-          v-if="survey.organization"
-          :src="url_host + survey.organization.logo_url"
-          alt="user img"
-        />
-        <img
-          class="w-28 h-28 p-3 border border-gray-100 overflow-hidden rounded-full"
-          v-else
-          :src="logo1337"
-          alt="user img"
-        />
+      <div class="user md:flex md:w-1/5 hidden mb-auto">
+        <div class="w-24 h-24 flex mx-auto">
+          <img
+            class="w-full object-cover rounded-full shadow-md"
+            v-if="survey.organization"
+            :src="url_host + survey.organization.logo_url"
+            alt="user img"
+          />
+          <img
+            class="w-full p-3 object-contain rounded-full border border-gray-100 shadow-md"
+            v-else
+            :src="logo1337"
+            alt="user img"
+          />
+        </div>
       </div>
-      <div class="flex-1 flex flex-col">
-        <div class="flex mb-2 sm:mb-0 justify-start">
+      <div class="md:w-4/5 w-full flex flex-col">
+        <div class="flex mb-2 md:mb-0 justify-start">
           <div
-            class="flex sm:hidden w-16 mb-auto rounded-full overflow-hidden shadow-md mr-2 sm:mx-5"
+            class="flex md:hidden w-16 mb-auto rounded-full overflow-hidden shadow-md mr-2 md:mx-5"
           >
-            <img
-              class="w-28 h-28 overflow-hidden rounded-full"
-              v-if="survey.organization"
-              :src="url_host + survey.organization.logo_url"
-              alt="logo img"
-            />
-            <img
-              class="w-16 h-16 p-3 border border-gray-100 overflow-hidden rounded-full"
-              v-else
-              :src="logo1337"
-              alt="logo img"
-            />
+            <div class="w-16 h-16 flex mx-auto">
+              <img
+                class="w-full object-cover rounded-full shadow-md"
+                v-if="survey.organization"
+                :src="url_host + survey.organization.logo_url"
+                alt="user img"
+              />
+              <img
+                class="w-full p-3 object-contain rounded-full border border-gray-100 shadow-md"
+                v-else
+                :src="logo1337"
+                alt="user img"
+              />
+            </div>
           </div>
           <div class="flex flex-1 flex-col my-auto">
             <div
-              class="text-sm sm:text-xl uppercase font-bold tracking-wider break-words mr-8"
+              class="text-sm md:text-xl uppercase font-bold tracking-wider break-words mr-8"
             >
               {{ survey.name }}
             </div>
@@ -83,13 +88,16 @@
             {{ survey.answers }} answers
           </span>
         </div>
-        <div class="text-sm sm:text-base break-words mb-2">
+        <div class="text-sm md:text-base break-words mb-2">
           {{ survey.description }}
         </div>
-        <div class="flex justify-center mt-auto mx-auto mb-4" v-if="$route.query.filter != 'completed'">
+        <div
+          class="flex justify-center mt-auto mx-auto mb-4"
+          v-if="$route.query.filter != 'completed'"
+        >
           <router-link :to="`/survey/${survey._id}`">
             <button
-              class="bg-green-500 text-white sm:w-40 rounded-lg sm:text-xl px-5 py-1 shadow-md hover:shadow-none focus:outline-none transition-all"
+              class="bg-green-500 text-white md:w-40 rounded-lg md:text-xl px-5 py-1 shadow-md hover:shadow-none focus:outline-none transition-all"
             >
               Start Survey
             </button>
@@ -99,7 +107,7 @@
               v-if="
                 user && (user.role == 'admin' || user._id == survey.user._id)
               "
-              class="bg-indigo-500 text-white sm:w-40 ml-3 rounded-lg sm:text-xl px-5 py-1 shadow-md hover:shadow-none focus:outline-none transition-all"
+              class="bg-indigo-500 text-white md:w-40 ml-3 rounded-lg md:text-xl px-5 py-1 shadow-md hover:shadow-none focus:outline-none transition-all"
             >
               Answers
             </button>

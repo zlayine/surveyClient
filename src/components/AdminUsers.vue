@@ -1,8 +1,8 @@
 <template>
   <div class="text-gray-900">
-    <div class="p-4 flex justify-between">
+    <div class="p-4 flex justify-between md:flex-row flex-col">
       <h1 class="text-3xl">Users</h1>
-      <div class="flex">
+      <div class="flex md:flex-row flex-col">
         <select
           v-model="role"
           @change="fetchUsers"
@@ -23,9 +23,9 @@
         </select>
       </div>
     </div>
-    <div class="px-3 py-4 flex justify-center">
+    <div class="px-3 py-4 overflow-x-auto">
       <table class="w-full text-md bg-white shadow-md rounded mb-4">
-        <tbody>
+        <tbody class="">
           <tr class="border-b">
             <th class="text-left p-3 px-5"></th>
             <th class="text-left p-3 px-5">Username</th>
@@ -39,12 +39,14 @@
             v-for="user in users"
             :key="user._id"
           >
-            <td class="p-3 px-5">
-              <img
-                class="w-12 h-12 overflow-hidden rounded-full"
-                :src="user.image_url"
-                alt="user img"
-              />
+            <td class="sm:p-3 sm:px-5">
+              <div class="w-12 h-12 mx-2">
+                <img
+                  class="w-full overflow-hidden rounded-full"
+                  :src="user.image_url"
+                  alt="user img"
+                />
+              </div>
             </td>
             <td class="p-3 px-5">{{ user.username }}</td>
             <td class="p-3 px-5">{{ user.role }}</td>
@@ -159,7 +161,7 @@ export default {
       this.fetchUsers();
     },
     async deleteUser() {
-			await this.$store.dispatch("adminDeleteUser", this.selected);
+      await this.$store.dispatch("adminDeleteUser", this.selected);
       this.selected = null;
     },
     async updateRole(id) {

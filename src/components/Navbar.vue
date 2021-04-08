@@ -12,7 +12,11 @@
       </div>
       <div
         class="hidden sm:flex ml-2 pl-5 border-l-2 items-center"
-        v-if="user && user.role == 'admin' && ($route.name == 'admin' || $route.name == 'admin-redirect')"
+        v-if="
+          user &&
+          user.role == 'admin' &&
+          ($route.name == 'admin' || $route.name == 'admin-redirect')
+        "
       >
         <router-link class="mr-5 text-center" to="/admin/users">
           <div class="">Users</div>
@@ -35,7 +39,7 @@
             :class="{ 'bg-indigo-500': $route.params.path == 'permissions' }"
           ></div>
         </router-link>
-				<router-link class="mr-5 text-center" to="/admin/organizations">
+        <router-link class="mr-5 text-center" to="/admin/organizations">
           <div class="">Organizations</div>
           <div
             class="w-16 h-1 rounded-t-lg mt-1 mx-auto bg-white transition-all"
@@ -97,7 +101,8 @@ export default {
       this.$router.push("/auth");
     },
     goToHome() {
-      this.$router.push({ name: "home", query: { filter: "new", page: 1 } });
+      if (this.$route.name != "home")
+        this.$router.push({ name: "home", query: { filter: "new", page: 1 } });
     },
   },
 };

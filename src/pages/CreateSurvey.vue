@@ -190,10 +190,6 @@ export default {
         (this.infoValid || this.updateInfo(survey)) &&
         this.questionsValid
       ) {
-        // this.questions = this.questions.map((q, index) => {
-        //   q.step = index;
-        //   return q;
-        // });
         this.survey.questions = this.questions;
         let obj = Object.assign({}, this.survey);
         let res = await this.$store.dispatch("createSurvey", obj);

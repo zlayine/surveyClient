@@ -1,6 +1,6 @@
 <template>
   <div class="text-gray-900">
-    <div class="p-4 flex justify-between">
+    <div class="p-4 flex justify-between md:flex-row flex-col">
       <h1 class="text-3xl">Surveys</h1>
       <div class="flex">
         <select
@@ -14,8 +14,8 @@
         </select>
       </div>
     </div>
-    <div class="px-3 py-4 flex justify-center">
-      <table class="w-full text-md bg-white shadow-md rounded mb-4 table-fixed">
+    <div class="px-3 py-4 overflow-x-auto">
+      <table class="w-full text-md bg-white shadow-md rounded mb-4">
         <tbody>
           <tr class="border-b">
             <th class="text-left p-3 px-5">Name</th>
