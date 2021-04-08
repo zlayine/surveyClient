@@ -4,7 +4,7 @@
     <div class="w-full sm:w-1/4 mx-auto" v-if="!surveys.length">
       <img class="w-full" :src="empty_img" alt="empty image" />
       <div class="text-center mt-2 text-xl">
-        No surveys around this corner..
+        No surveys in this corner..
       </div>
     </div>
     <div class="flex flex-row justify-between mt-3 flex-wrap">
