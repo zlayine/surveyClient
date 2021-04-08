@@ -18,12 +18,7 @@
         </template>
         <template v-else> Sign in with intra </template>
       </button>
-      <div
-        class="rounded-xl mt-2 bg-gray-500 text-white text-lg text-center px-8 py-2 cursor-pointer"
-        @click="demo"
-      >
-        Demo
-      </div>
+      
     </div>
   </div>
 </template>
@@ -58,10 +53,6 @@ export default {
       this.loading = true;
       await this.$store.dispatch("createUser", this.$route.query.code + "");
       this.loading = false;
-      this.$router.push("/");
-    },
-    async demo() {
-      await this.$store.dispatch("loginDemo");
       this.$router.push("/");
     },
   },

@@ -373,41 +373,6 @@ const store = createStore({
 				commit("SET_NOTIFICATION", { msg: error, error: 1 });
 			}
 		},
-		async loginDemo({ commit }) {
-			try {
-				commit("UPDATE_LOADING")
-				const res = await axios({
-					url: import.meta.env.VITE_GRAPHQL_API,
-					method: 'post',
-					data: {
-						query: `
-							query { 
-								loginDemo {
-									user {
-										_id
-										username
-										role
-										image_url
-										campus
-									}
-									token
-								}
-							}
-						`
-					}
-				});
-				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
-					commit("LOGIN", res.data.data.loginDemo)
-					commit("SET_NOTIFICATION", { msg: "Logged in successfully!", error: 0 });
-				}
-				commit("UPDATE_LOADING")
-				return "1";
-			} catch (error) {
-				console.log(error)
-				commit("UPDATE_LOADING")
-				commit("SET_NOTIFICATION", { msg: error, error: 1 });
-			}
-		},
 		async getUser({ commit }, id) {
 			try {
 				commit("UPDATE_LOADING")
