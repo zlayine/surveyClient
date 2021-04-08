@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { createStore } from "vuex"
 import { getLocalUser } from './auth.js';
+import { saveAs } from 'file-saver'
 
 const createQuestionOption = async (commit, questionId, options) => {
 	try {
@@ -274,7 +275,30 @@ const store = createStore({
 		},
 		ADMIN_REMOVE_PERMISSION(state, payload) {
 			state.admin.permissions = state.admin.permissions.filter(u => u._id != payload);
-		}
+		},
+
+		EXPORT_CSV(state, payload) {
+			if (!payload)
+				return;
+			let questions = payload.questions.map(q => q.name);
+			let answers = payload.data.map(a => {
+				a.answers = a.answers.map(an => {
+					if (an.question.question_type.type == 'text')
+						return an.answer_text;
+					return an.question_option.name;
+				})
+				return a.answers;
+			})
+			let csvContent = "";
+			csvContent += [
+				questions.join(";"),
+				...answers.map(item => item.join(";"))
+			]
+				.join("\n")
+				.replace(/(^\[)|(\]$)/gm, "");
+			var blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+			saveAs(blob, `export_${state.surveyStats.name.replace(' ', '_').toLowerCase()}_${Date.now()}.csv`);
+		},
 	},
 	actions: {
 		async createUser({ commit }, code) {
@@ -1204,6 +1228,34 @@ const store = createStore({
 			} catch (error) {
 				console.log(error)
 				commit("SET_NOTIFICATION", { msg: "Failed to approve permission", error: 1 });
+				commit("UPDATE_LOADING")
+			}
+		},
+		async exportSurveyAnswers({ commit }, id) {
+			try {
+				commit("UPDATE_LOADING")
+				const res = await axios({
+					url: import.meta.env.VITE_GRAPHQL_API,
+					method: 'post',
+					data: {
+						query: `
+						query { 
+							exportSurveyAnswers(id: "${id}") {
+								questions
+								data
+							}
+						}
+					`}
+				});
+				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
+					commit("EXPORT_CSV", res.data.data.exportSurveyAnswers);
+					commit("SET_NOTIFICATION", { msg: "Answers exported successfully!", error: 0 });
+				}
+				commit("UPDATE_LOADING")
+				return "success";
+			} catch (error) {
+				console.log(error)
+				commit("SET_NOTIFICATION", { msg: "Failed to export answers", error: 1 });
 				commit("UPDATE_LOADING")
 			}
 		}

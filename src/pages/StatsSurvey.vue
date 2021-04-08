@@ -57,14 +57,14 @@
             @click="exportSurvey"
           >
             <i-fa icon="download" />
-            <span class=" ml-1 sm:inline-block">Export</span>
+            <span class="ml-1 sm:inline-block">Export</span>
           </div>
           <div
             class="bg-indigo-400 text-white px-3 py-2 rounded-xl shadow-md hover:shadow-none cursor-pointer mr-2"
             @click="shareSurvey"
           >
             <i-fa icon="share-alt" />
-            <span class=" ml-1 sm:inline-block">Share</span>
+            <span class="ml-1 sm:inline-block">Share</span>
           </div>
         </div>
       </div>
@@ -136,7 +136,9 @@ export default {
         error: 0,
       });
     },
-    exportSurvey() {},
+    exportSurvey() {
+      this.$store.dispatch("exportSurveyAnswers", this.survey._id);
+    },
   },
   async mounted() {
     // if (!this.survey || this.$route.params.id != this.survey._id)
