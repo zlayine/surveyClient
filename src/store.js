@@ -790,7 +790,7 @@ const store = createStore({
 				});
 				commit("UPDATE_LOADING")
 				if (!res.data.errors || !check_errors(commit, res.data, res.data.errors[0].message)) {
-					commit("SET_NOTIFICATION", { msg: "Questions updated successfully!", error: 1 });
+					commit("SET_NOTIFICATION", { msg: "Questions updated successfully!", error: 0 });
 				}
 				return "success";
 			} catch (error) {
