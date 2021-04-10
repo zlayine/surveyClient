@@ -32,7 +32,6 @@
                   'pointer-events-none': edit,
                 }"
               >
-                <option value="0">Question type</option>
                 <option value="choice">Choice</option>
                 <option value="multiple">Multiple</option>
                 <option value="rate">Rate</option>
