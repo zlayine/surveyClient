@@ -285,10 +285,24 @@ const store = createStore({
 				a.answers = a.answers.map(an => {
 					if (an.question.question_type.type == 'text')
 						return an.answer_text;
+					if (an.question.question_type.type == 'multiple')
+						return { name: an.question_option.name, question: an.question_option.question }
 					return an.question_option.name;
 				})
 				return a.answers;
 			})
+			answers = answers.map(an => an.reduce((arr, item, curr) => {
+				if (item.name) {
+					if (arr.length && answers[0][curr].question == answers[0][curr - 1].question) {
+						arr[arr.length - 1] = arr[arr.length - 1] + "," + item.name;
+					}
+					else
+						arr.push(item.name);
+				}
+				else
+					arr.push(item);
+				return arr;
+			}, []));
 			let csvContent = "";
 			csvContent += [
 				questions.join(";"),

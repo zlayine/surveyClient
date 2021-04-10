@@ -60,7 +60,7 @@
             <div
               @click="show = true"
               v-if="survey.organization == defaultOrg"
-              class="flex justify-center items-center text-white text-xl border border-gray-200 w-1/2 h-full p-2 rounded-xl mt-1 ml-2 cursor-pointer shadow-md bg-indigo-400 hover:shadow-none transition-all"
+              class="flex justify-center items-center text-white text-xl border border-gray-200 w-1/2 h-full p-2 rounded-xl mt-1 ml-2 cursor-pointer shadow-md bg-indigo-500 hover:shadow-none transition-all"
             >
               <i-fa
                 class="block h-full border-gray-300 text-xl my-auto mr-3 text-white"
@@ -127,7 +127,7 @@
           >
             <button
               @click="$emit('publish', survey)"
-              class="bg-indigo-400 rounded-xl px-6 py-1 text-white shadow-md text-lg focus:outline-none hover:shadow-none transition-all"
+              class="bg-indigo-500 rounded-xl px-6 py-1 text-white shadow-md text-lg focus:outline-none hover:shadow-none transition-all"
             >
               Publish
             </button>
@@ -135,7 +135,7 @@
           <button
             @click="$emit('update', survey)"
             v-if="edit"
-            class="bg-green-400 rounded-xl px-6 py-2 text-white shadow-md focus:outline-none hover:shadow-none transition-all"
+            class="bg-green-500 rounded-xl px-6 py-2 text-white shadow-md focus:outline-none hover:shadow-none transition-all"
           >
             Update
           </button>

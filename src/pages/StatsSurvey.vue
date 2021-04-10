@@ -53,14 +53,14 @@
 
         <div class="flex my-auto justify-center md:mt-2">
           <div
-            class="bg-indigo-400 text-white px-3 py-2 rounded-xl shadow-md hover:shadow-none cursor-pointer mr-2"
+            class="bg-indigo-500 text-white px-3 py-2 rounded-xl shadow-md hover:shadow-none cursor-pointer mr-2"
             @click="exportSurvey"
           >
             <i-fa icon="download" />
             <span class="ml-1 sm:inline-block">Export</span>
           </div>
           <div
-            class="bg-indigo-400 text-white px-3 py-2 rounded-xl shadow-md hover:shadow-none cursor-pointer mr-2"
+            class="bg-indigo-500 text-white px-3 py-2 rounded-xl shadow-md hover:shadow-none cursor-pointer mr-2"
             @click="shareSurvey"
           >
             <i-fa icon="share-alt" />

@@ -23,6 +23,7 @@
         :class="{
           'bg-indigo-100': selected,
           'text-indigo-400': selected,
+          'ring-indigo-400': selected,
           'ring-opacity-100': selected,
           'pointer-events-none': disabled,
         }"
@@ -38,6 +39,8 @@
       :class="{
         'bg-indigo-100': selected,
         'text-indigo-400': selected,
+        'ring-indigo-400': selected,
+        'ring-opacity-100': selected,
         'pointer-events-none': disabled,
       }"
       @click="$emit('click', item)"

@@ -158,7 +158,7 @@
             <button
               v-show="typeChecker(question) && !edit"
               @click="addOption(question)"
-              class="mt-2 ring ring-green-400 ring-opacity-30 border-green-400 border-opacity-50 focus:outline-none w-full rounded-xl p-2 text-lg text-green-400 transition-all"
+              class="mt-2 ring ring-green-400 ring-opacity-30 border-green-400 border-opacity-50 focus:outline-none w-full rounded-xl p-2 text-lg text-green-500 transition-all"
             >
               <i-fa icon="plus" class="mr-1" />Add Option
             </button>
@@ -170,14 +170,14 @@
       <div
         v-if="!edit"
         @click="newQuestion"
-        class="bg-green-400 text-xl rounded-full text-white w-12 h-12 shadow-xl mt-3 flex cursor-pointer hover:shadow-none transition-all"
+        class="bg-green-500 text-xl rounded-full text-white w-12 h-12 shadow-xl mt-3 flex cursor-pointer hover:shadow-none transition-all"
       >
         <i-fa icon="plus" class="m-auto" />
       </div>
       <div
         @click="saveQuestions"
         v-if="!edit"
-        class="bg-indigo-400 text-xl rounded-xl px-3 justify-center items-center text-white shadow-xl mt-3 flex cursor-pointer hover:shadow-none transition-all"
+        class="bg-indigo-500 text-xl rounded-xl px-3 justify-center items-center text-white shadow-xl mt-3 flex cursor-pointer hover:shadow-none transition-all"
       >
         Save
       </div>
