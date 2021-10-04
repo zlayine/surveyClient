@@ -64,7 +64,6 @@ export default {
     let filter = this.$route.query.filter;
     if (page) this.page = page;
     if (filter) this.filter = filter;
-
     this.$router.replace({ query: { filter: this.filter, page: this.page } });
     this.fetchSurveys();
   },
